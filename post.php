@@ -14,8 +14,33 @@ if (!empty($this->options->Breadcrumbs) && in_array('Postshow', $this->options->
 <li><?php Postviews($this); ?></li>
 </ul>
 <div class="post-content">
-<?php $this->content(); ?>
+<!-- 回复可见开始 此处注释的为原版内容：?php $this->content(); ?>-->
+<?php
+$db = Typecho_Db::get();
+$sql = $db->select()->from('table.comments')
+    ->where('cid = ?',$this->cid)
+    ->where('mail = ?', $this->remember('mail',true))
+    ->where('status = ?', 'approved')
+//只有通过审核的评论才能看回复可见内容
+    ->limit(1);
+$result = $db->fetchAll($sql);
+if($this->user->hasLogin() || $result) {
+    $content = preg_replace("/\[hidden\](.*?)\[\/hidden\]/sm",'<div class="reply2view">$1</div>',$this->content);
+}
+else{
+    $content = preg_replace("/\[hidden\](.*?)\[\/hidden\]/sm",'<div class="reply2view">此处内容需要评论回复后方可阅读</div>',$this->content);
+}
+echo $content;
+?>
+<!-- 回复可见结束（审核通过） -->
 </div>
+<!-- 文章底部广告开始 -->
+<?php if (isset($this->options->GoogleAdClient) && $this->options->GoogleAdClient && isset($this->options->GoogleAdSlotPost) && $this->options->GoogleAdSlotPost): ?>
+<div id="gg-post-foot"<?php if (isset($this->options->GoogleAdPostStyle) && $this->options->GoogleAdPostStyle): ?> style="<?php $this->options->GoogleAdPostStyle(); ?>"<?php endif; ?>>
+    <?php $this->options->GoogleAdSlotPost(); ?>
+</div>
+<?php endif; ?>
+<!-- 文章底部广告结束 -->
 <?php if ($this->options->WeChat || $this->options->Alipay): ?>
 <p class="rewards">打赏: <?php if ($this->options->WeChat): ?>
 <a><img src="<?php $this->options->WeChat(); ?>" alt="微信收款二维码" />微信</a><?php endif; if ($this->options->WeChat && $this->options->Alipay): ?>, <?php endif; if ($this->options->Alipay): ?>

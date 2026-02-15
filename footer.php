@@ -13,7 +13,18 @@
 <?php endif; ?>
 <p>&copy; <?php echo date('Y'); ?> <a href="<?php $this->options->siteUrl(); ?>"><?php $this->options->title(); ?></a>. Powered by <a href="http://www.typecho.org" target="_blank">Typecho</a> &amp; <a href="http://www.offodd.com/17.html" target="_blank">Initial</a>.</p>
 <?php if ($this->options->ICPbeian): ?>
-<p><a href="http://beian.miit.gov.cn" class="icpnum" target="_blank" rel="noreferrer"><?php $this->options->ICPbeian(); ?></a></p>
+<!-- 备案开始 -->
+<?php if ($this->options->ICPbeian || (isset($this->options->Gonganbeian) && $this->options->Gonganbeian)): ?>
+<p>
+<?php if ($this->options->ICPbeian): ?>
+<a href="http://beian.miit.gov.cn" class="icpnum" target="_blank" rel="noreferrer"> <?php $this->options->ICPbeian(); ?></a>
+<?php endif; ?>
+<?php if ($this->options->ICPbeian && isset($this->options->Gonganbeian) && $this->options->Gonganbeian): ?> | <?php endif; ?>
+<?php if (isset($this->options->Gonganbeian) && $this->options->Gonganbeian): ?>
+<a href="https://beian.mps.gov.cn/#/query/webSearch" class="icpnum" target="_blank" rel="noreferrer"> <?php $this->options->Gonganbeian(); ?></a>
+<?php endif; ?>
+</p>
+<!-- 备案结束 -->
 <?php endif; if ($this->options->AjaxLoad): ?>
 <input id="token" type="hidden" value="<?php echo Typecho_Widget::widget('Widget_Security')->getTokenUrl('Token'); ?>" readonly="readonly" />
 <?php endif; ?>
@@ -43,7 +54,42 @@
 <script src="<?php cjUrl('main.min.js') ?>"></script>
 <?php $this->footer(); ?>
 <?php if ($this->options->CustomContent): $this->options->CustomContent(); ?>
-
+<!-- 广告总引入开始 -->
+<?php endif; ?>
+<?php if (isset($this->options->GoogleAdClient) && $this->options->GoogleAdClient): ?>
+<!-- 延迟加载广告主脚本，并在加载完成后手动 push 广告 -->
+<script type="text/javascript">
+  function downloadJSAtOnload() {
+    var script = document.createElement("script");
+    script.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=<?php $this->options->GoogleAdClient(); ?>";
+    script.async = true;
+    script.crossOrigin = "anonymous";
+    script.onload = function () {
+      // 主脚本加载完成后再执行广告推送
+      (adsbygoogle = window.adsbygoogle || []).push({});
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    };
+    document.body.appendChild(script);
+  }
+  if (window.addEventListener)
+    window.addEventListener("load", downloadJSAtOnload, false);
+  else if (window.attachEvent)
+    window.attachEvent("onload", downloadJSAtOnload);
+  else window.onload = downloadJSAtOnload;
+</script>
+<!-- 广告总引入结束 -->
+<?php endif; ?>
+<?php if (!isset($this->options->GoogleRecaptchaReplace) || $this->options->GoogleRecaptchaReplace): ?>
+<!-- goog链接替换开始 -->
+<script>
+// 确保在DOM加载后执行
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('script[src*="www.google.com/recaptcha/"]').forEach(function(script) {
+    script.src = script.src.replace('www.google.com/recaptcha/', 'www.recaptcha.net/recaptcha/');
+  });
+});
+</script>
+<!-- goog链接替换结束 -->
 <?php endif; ?>
 </body>
 </html><?php if ($this->options->compressHtml): $html_source = ob_get_contents(); ob_clean(); print compressHtml($html_source); ob_end_flush(); endif; ?>

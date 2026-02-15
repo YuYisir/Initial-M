@@ -45,6 +45,13 @@
 </ul>
 </section>
 <?php endif; ?>
+<!-- 侧边栏广告开始 -->
+<?php if (isset($this->options->GoogleAdClient) && $this->options->GoogleAdClient && isset($this->options->GoogleAdSlotSidebar) && $this->options->GoogleAdSlotSidebar): ?>
+<div class="gg-container"<?php if (isset($this->options->GoogleAdSidebarStyle) && $this->options->GoogleAdSidebarStyle): ?> style="<?php $this->options->GoogleAdSidebarStyle(); ?>"<?php endif; ?>>
+    <?php $this->options->GoogleAdSlotSidebar(); ?>
+</div>
+<?php endif; ?>
+<!-- 侧边栏广告结束 -->
 <?php if (!empty($this->options->sidebarBlock) && in_array('ShowTag', $this->options->sidebarBlock)): ?>
 <section class="widget">
 <h3 class="widget-title">标签</h3>

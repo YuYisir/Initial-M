@@ -181,8 +181,99 @@ function themeConfig($form) {
 	$ICPbeian = new Typecho_Widget_Helper_Form_Element_Text('ICPbeian', NULL, NULL, _t('ICP备案号'), _t('在这里输入ICP备案号,留空则不显示'));
 	$form->addInput($ICPbeian);
 
+	$Gonganbeian = new Typecho_Widget_Helper_Form_Element_Text('Gonganbeian', NULL, NULL, _t('公安备案号'), _t('在这里输入公安备案号,留空则不显示'));
+	$form->addInput($Gonganbeian);
+
 	$CustomContent = new Typecho_Widget_Helper_Form_Element_Textarea('CustomContent', NULL, NULL, _t('底部自定义内容'), _t('位于底部，footer之后body之前，适合放置一些JS内容，如网站统计代码等（若开启全站Pjax，目前支持Google和百度统计的回调，其余统计代码可能会不准确）'));
 	$form->addInput($CustomContent);
+
+	// Google广告设置开始
+	$GoogleAdClient = new Typecho_Widget_Helper_Form_Element_Text('GoogleAdClient', NULL, NULL, _t('Google Ad Client ID'), _t('在这里输入Google广告的Client ID，格式为：ca-pub-xxxxxxxxxxxxxxxx，留空则不显示广告'));
+	$form->addInput($GoogleAdClient);
+
+	$GoogleAdSlotPost = new Typecho_Widget_Helper_Form_Element_Textarea('GoogleAdSlotPost', NULL, NULL, _t('Google-文章底部广告代码'), _t('提示：后台已配置优化，无需填写完整广告代码<br>只需填写广告的核心内容，完整的&lt;ins&gt;标签内容<br>留空则不显示文章底部广告'));
+	$GoogleAdSlotPost->input->setAttribute('class', 'w-100');
+	$form->addInput($GoogleAdSlotPost);
+
+	$GoogleAdPostStyle = new Typecho_Widget_Helper_Form_Element_Text('GoogleAdPostStyle', NULL, NULL, _t('Google-文章底部广告样式'), _t('在这里输入文章底部广告容器的CSS样式，如：margin: 20px 0; padding: 10px; background: #f5f5f5; 留空则使用默认样式'));
+	$form->addInput($GoogleAdPostStyle);
+
+	$GoogleAdSlotSidebar = new Typecho_Widget_Helper_Form_Element_Textarea('GoogleAdSlotSidebar', NULL, NULL, _t('Google-侧边栏广告代码'), _t('提示：后台已配置优化，无需填写完整广告代码<br>只需填写广告的核心内容，如Slot ID或完整的&lt;ins&gt;标签内容<br>留空则不显示侧边栏广告'));
+	$GoogleAdSlotSidebar->input->setAttribute('class', 'w-100');
+	$form->addInput($GoogleAdSlotSidebar);
+
+	$GoogleAdSidebarStyle = new Typecho_Widget_Helper_Form_Element_Text('GoogleAdSidebarStyle', NULL, NULL, _t('Google-侧边栏广告样式'), _t('在这里输入侧边栏广告容器的CSS样式，如：margin: 20px 0; padding: 10px; background: #f5f5f5; 留空则使用默认样式'));
+	$form->addInput($GoogleAdSidebarStyle);
+
+	$GoogleRecaptchaReplace = new Typecho_Widget_Helper_Form_Element_Radio('GoogleRecaptchaReplace', 
+	array(1 => _t('启用'),
+	0 => _t('关闭')),
+	1, _t('Google reCAPTCHA链接替换'), _t('默认启用，启用则会将Google reCAPTCHA的链接从www.google.com替换为www.recaptcha.net，确保reCAPTCHA在某些地区可以正常访问'));
+	$form->addInput($GoogleRecaptchaReplace);
+	// Google广告设置结束
+	// 主题设置备份开始
+	$str1 = explode('/themes/', Helper::options()->themeUrl);
+	$str2 = explode('/', $str1[1]);
+	$name=$str2[0];
+	$db = Typecho_Db::get();
+	$sjdq=$db->fetchRow($db->select()->from ('table.options')->where ('name = ?', 'theme:'.$name));
+	$ysj = $sjdq['value'];
+	if(isset($_POST['type']))
+	{ 
+	if($_POST["type"]=="备份模板设置数据"){
+	if($db->fetchRow($db->select()->from ('table.options')->where ('name = ?', 'theme:'.$name.'bf'))){
+	$update = $db->update('table.options')->rows(array('value'=>$ysj))->where('name = ?', 'theme:'.$name.'bf');
+	$updateRows= $db->query($update);
+	echo '<div class="tongzhi col-mb-12 home">备份已更新，请等待自动刷新！如果等不到请点击';
+	?>    
+	<a href="<?php Helper::options()->adminUrl('options-theme.php'); ?>">这里</a></div>
+	<script language="JavaScript">window.setTimeout("location=\'<?php Helper::options()->adminUrl('options-theme.php'); ?>\'", 2500);</script>
+	<?php
+	}else{
+	if($ysj){
+		$insert = $db->insert('table.options')
+		->rows(array('name' => 'theme:'.$name.'bf','user' => '0','value' => $ysj));
+		$insertId = $db->query($insert);
+	echo '<div class="tongzhi col-mb-12 home">备份完成，请等待自动刷新！如果等不到请点击';
+	?>    
+	<a href="<?php Helper::options()->adminUrl('options-theme.php'); ?>">这里</a></div>
+	<script language="JavaScript">window.setTimeout("location=\'<?php Helper::options()->adminUrl('options-theme.php'); ?>\'", 2500);</script>
+	<?php
+	}
+	}
+			}
+	if($_POST["type"]=="还原模板设置数据"){
+	if($db->fetchRow($db->select()->from ('table.options')->where ('name = ?', 'theme:'.$name.'bf'))){
+	$sjdub=$db->fetchRow($db->select()->from ('table.options')->where ('name = ?', 'theme:'.$name.'bf'));
+	$bsj = $sjdub['value'];
+	$update = $db->update('table.options')->rows(array('value'=>$bsj))->where('name = ?', 'theme:'.$name);
+	$updateRows= $db->query($update);
+	echo '<div class="tongzhi col-mb-12 home">检测到模板备份数据，恢复完成，请等待自动刷新！如果等不到请点击';
+	?>    
+	<a href="<?php Helper::options()->adminUrl('options-theme.php'); ?>">这里</a></div>
+	<script language="JavaScript">window.setTimeout("location=\'<?php Helper::options()->adminUrl('options-theme.php'); ?>\'", 2000);</script>
+	<?php
+	}else{
+	echo '<div class="tongzhi col-mb-12 home">没有模板备份数据，恢复不了哦！</div>';
+	}
+	}
+	if($_POST["type"]=="删除备份数据"){
+	if($db->fetchRow($db->select()->from ('table.options')->where ('name = ?', 'theme:'.$name.'bf'))){
+	$delete = $db->delete('table.options')->where ('name = ?', 'theme:'.$name.'bf');
+	$deletedRows = $db->query($delete);
+	echo '<div class="tongzhi col-mb-12 home">删除成功，请等待自动刷新，如果等不到请点击';
+	?>    
+	<a href="<?php Helper::options()->adminUrl('options-theme.php'); ?>">这里</a></div>
+	<script language="JavaScript">window.setTimeout("location=\'<?php Helper::options()->adminUrl('options-theme.php'); ?>\'", 2500);</script>
+	<?php
+	}else{
+	echo '<div class="tongzhi col-mb-12 home">不用删了！备份不存在！！！</div>';
+	}
+	}
+		}
+	echo '<form class="protected home col-mb-12" action="?'.$name.'bf" method="post">
+	<input type="submit" name="type" class="btn btn-s" value="备份模板设置数据" />&nbsp;&nbsp;<input type="submit" name="type" class="btn btn-s" value="还原模板设置数据" />&nbsp;&nbsp;<input type="submit" name="type" class="btn btn-s" value="删除备份数据" /></form>';
+	// 主题设置备份结束
 }
 
 function themeInit($archive) {
@@ -556,3 +647,45 @@ function themeFields($layout) {
 	0, _t('文章目录'), _t('默认关闭，启用则会在文章内显示“文章目录”（若文章内无任何标题，则不显示目录），需要在“控制台-设置外观-文章目录”启用“使用文章内设定”后，方可生效'));
 	$layout->addItem($catalog);
 }
+/*回复可见样式开始*/
+Typecho_Plugin::factory('Widget_Abstract_Contents')->excerptEx = array('myyodux','one');
+Typecho_Plugin::factory('Widget_Abstract_Contents')->contentEx = array('myyodux','one');
+class myyodux {
+    public static function one($con,$obj,$text)
+    {
+      $text = empty($text)?$con:$text;
+      if(!$obj->is('single')){
+      $text = preg_replace("/\[hidden\](.*?)\[\/hidden\]/sm",'',$text);
+      }
+      
+               return $text;
+}
+}/*回复可见样式结束*/
+/* 增加评论验证*/
+$comment = spam_protection_pre($comment, $post, $result);
+function spam_protection_math() {
+    $num1 = rand(1, 15);
+    $num2 = rand(1, 15);
+    echo "<div style=\"display:flex;flex-direction: column;align-items: flex-start;\"><p for=\"math\" id=\"Verification_code\" style=\"margin:0\"><code>$num1</code>+<code>$num2</code> 等于：</p><input type=\"text\" name=\"sum\" class=\"text\" value=\"\" size=\"25\" id=\"sum\" tabindex=\"4\" style=\"flex:1\" placeholder=\"计算结果 *\">\n</div>";
+    echo "<input type=\"hidden\" name=\"num1\" value=\"$num1\">\n";
+    echo "<input type=\"hidden\" name=\"num2\" value=\"$num2\">";
+}
+function spam_protection_pre($comment, $post, $result) {
+    if ($_REQUEST['text'] != null) {
+        If($_POST['num1'] == null || $_POST['num2'] == null) {
+            throw new Typecho_Widget_Exception(_t('验证码异常.', '评论失败'));
+        } else {
+            $sum = $_POST['sum'];
+            switch ($sum) {
+            case $_POST['num1'] + $_POST['num2'] : break;
+            case null:
+                throw new Typecho_Widget_Exception(_t('请输入验证码.', '评论失败'));
+                break;
+            default:
+                throw new Typecho_Widget_Exception(_t('验证码错误.', '评论失败'));
+            }
+        }
+    }
+    return $comment;
+}
+/* 增加评论验证结束*/
