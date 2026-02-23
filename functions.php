@@ -79,7 +79,7 @@ function themeConfig($form) {
 	array('jd' => _t('jsDelivr'),
 	'sc' => _t('Staticfile'),
 	'cf' => _t('CDNJS')),
-	'jd', _t('公共静态资源来源'), _t('默认jsDelivr，若JS文件异常，可尝试切换来源'));
+	'cf', _t('公共静态资源来源'), _t('默认CDNJS，若JS文件异常，可尝试切换来源'));
 	$form->addInput($cjCDN);
 
 	$GravatarUrl = new Typecho_Widget_Helper_Form_Element_Radio('GravatarUrl', 
@@ -89,7 +89,7 @@ function themeConfig($form) {
 	'https://gravatar.loli.net/avatar/' => _t('loli源'),
 	'https://cdn.sep.cc/avatar/' => _t('sep源'),
 	'https://dn-qiniu-avatar.qbox.me/avatar/' => _t('七牛源')),
-	false, _t('Gravatar头像源'), _t('默认官方源，若头像显示异常，可尝试切换来源'));
+	'https://cravatar.com/avatar/', _t('Gravatar头像源'), _t('默认国内源，若头像显示异常，可尝试切换来源'));
 	$form->addInput($GravatarUrl);
 
 	$compressHtml = new Typecho_Widget_Helper_Form_Element_Radio('compressHtml', 
