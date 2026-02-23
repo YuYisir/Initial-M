@@ -69,7 +69,7 @@ echo $commentClass;
 	if ($comments->parameter->allowComment || Typecho_Widget::widget('Widget_User')->pass('editor', true)) {
 		echo ' class="whisper-reply" onclick="return TypechoComment.reply(\'' . $comments->theId . '\', ' . $comments->coid . ');"';
 	}
-?>><?php if ($comments->levels > 1) {CommentAt($comments->coid);}echo strip_tags(str_replace(PHP_EOL, "<br>", $comments->text), "<br>"); ?></span>
+?>><?php if ($comments->levels > 1) {CommentAt($comments->coid);}echo strip_tags(str_replace(PHP_EOL, "<br>", hrefOpen(Markdown::convert($comments->text))), '<br><strong><a><img><pre><code>' . Helper::options()->commentsHTMLTagAllowed); ?></span>
 <?php if ($comments->status == 'waiting') { ?>
 <em>您的评论正等待审核！</em>
 <?php } ?>

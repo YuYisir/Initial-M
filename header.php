@@ -98,6 +98,13 @@ endif; ?>
 </div>
 </div>
 </header>
+<?php if ($this->options->Announcement && $this->options->AnnouncementContent): ?>
+<div class="announcement">
+	<div class="container">
+		<?php echo $this->options->AnnouncementContent; ?>
+	</div>
+</div>
+<?php endif; ?>
 <div id="body"<?php if ($this->options->PjaxOption): ?> in-pjax<?php endif; ?>>
 <div class="container clearfix">
 <div id="main">

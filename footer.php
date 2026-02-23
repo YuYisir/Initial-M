@@ -6,13 +6,16 @@
 <?php if (!empty($this->options->ShowLinks) && in_array('footer', $this->options->ShowLinks)): ?>
 <ul class="links">
 <?php Links($this->options->IndexLinksSort); ?>
-<?php if (FindContents('page-links.php', 'order', 'a', 1)): ?>
-<li><a href="<?php echo FindContents('page-links.php', 'order', 'a', 1)[0]['permalink']; ?>">更多...</a></li>
+<?php $page_links = FindContents('page-links.php', 'order', 'a', 1);
+if ($page_links):
+	$widget = Typecho_Widget::widget('Widget_Abstract_Contents');
+	$widget->push($page_links[0]);
+?>
+<li><a href="<?php echo $widget->permalink; ?>">更多...</a></li>
 <?php endif; ?>
 </ul>
 <?php endif; ?>
 <p>&copy; <?php echo date('Y'); ?> <a href="<?php $this->options->siteUrl(); ?>"><?php $this->options->title(); ?></a>. Powered by <a href="http://www.typecho.org" target="_blank">Typecho</a> &amp; <a href="http://www.offodd.com/17.html" target="_blank">Initial</a>.</p>
-<?php if ($this->options->ICPbeian): ?>
 <!-- 备案开始 -->
 <?php if ($this->options->ICPbeian || (isset($this->options->Gonganbeian) && $this->options->Gonganbeian)): ?>
 <p>
@@ -54,8 +57,8 @@
 <script src="<?php cjUrl('main.min.js') ?>"></script>
 <?php $this->footer(); ?>
 <?php if ($this->options->CustomContent): $this->options->CustomContent(); ?>
-<!-- 广告总引入开始 -->
 <?php endif; ?>
+<!-- 广告总引入开始 -->
 <?php if (isset($this->options->GoogleAdClient) && $this->options->GoogleAdClient): ?>
 <!-- 延迟加载广告主脚本，并在加载完成后手动 push 广告 -->
 <script type="text/javascript">
@@ -65,9 +68,7 @@
     script.async = true;
     script.crossOrigin = "anonymous";
     script.onload = function () {
-      // 主脚本加载完成后再执行广告推送
-      (adsbygoogle = window.adsbygoogle || []).push({});
-      (adsbygoogle = window.adsbygoogle || []).push({});
+      // 广告位会在各自位置自行初始化，无需在此处统一推送
     };
     document.body.appendChild(script);
   }
@@ -77,8 +78,8 @@
     window.attachEvent("onload", downloadJSAtOnload);
   else window.onload = downloadJSAtOnload;
 </script>
-<!-- 广告总引入结束 -->
 <?php endif; ?>
+<!-- 广告总引入结束 -->
 <?php if (!isset($this->options->GoogleRecaptchaReplace) || $this->options->GoogleRecaptchaReplace): ?>
 <!-- goog链接替换开始 -->
 <script>

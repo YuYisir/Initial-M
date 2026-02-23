@@ -1,7 +1,7 @@
 <?php
 if (!defined('__TYPECHO_ROOT_DIR__')) exit;
 error_reporting(0);
-define('INITIAL_VERSION_NUMBER', '2.5.5');
+define('INITIAL_VERSION_NUMBER', '3.1.0');
 if (Helper::options()->GravatarUrl) define('__TYPECHO_GRAVATAR_PREFIX__', Helper::options()->GravatarUrl);
 
 function themeConfig($form) {
@@ -84,9 +84,10 @@ function themeConfig($form) {
 
 	$GravatarUrl = new Typecho_Widget_Helper_Form_Element_Radio('GravatarUrl', 
 	array(false => _t('官方源'),
-	'https://cn.gravatar.com/avatar/' => _t('国内源'),
+	'https://cravatar.com/avatar/' => _t('国内源'),
+	'https://weavatar.com/avatar/' => _t('weavatar源'),
 	'https://gravatar.loli.net/avatar/' => _t('loli源'),
-	'https://sdn.geekzu.org/avatar/' => _t('极客族源'),
+	'https://cdn.sep.cc/avatar/' => _t('sep源'),
 	'https://dn-qiniu-avatar.qbox.me/avatar/' => _t('七牛源')),
 	false, _t('Gravatar头像源'), _t('默认官方源，若头像显示异常，可尝试切换来源'));
 	$form->addInput($GravatarUrl);
@@ -187,6 +188,15 @@ function themeConfig($form) {
 	$CustomContent = new Typecho_Widget_Helper_Form_Element_Textarea('CustomContent', NULL, NULL, _t('底部自定义内容'), _t('位于底部，footer之后body之前，适合放置一些JS内容，如网站统计代码等（若开启全站Pjax，目前支持Google和百度统计的回调，其余统计代码可能会不准确）'));
 	$form->addInput($CustomContent);
 
+	$Announcement = new Typecho_Widget_Helper_Form_Element_Radio('Announcement', 
+	array(1 => _t('启用'),
+	0 => _t('关闭')),
+	0, _t('公告栏'), _t('默认关闭，启用后将在页面顶部显示公告栏'));
+	$form->addInput($Announcement);
+
+	$AnnouncementContent = new Typecho_Widget_Helper_Form_Element_Textarea('AnnouncementContent', NULL, NULL, _t('公告栏内容'), _t('在这里输入公告栏内容，支持HTML标签，留空则不显示公告栏<br><b class="notice">CSS类名提示：</b><br>• 公告栏容器：<code>.announcement</code><br>• 内容容器：<code>.announcement .container</code><br><b class="notice">示例样式（可复制到「自定义样式」）：</b><br><code>.announcement { background: #fff3cd; color: #856404; padding: 10px 0; margin-bottom: 20px; border-bottom: 1px solid #ffeeba; } .announcement .container { text-align: center; }</code>'));
+	$form->addInput($AnnouncementContent);
+
 	// Google广告设置开始
 	$GoogleAdClient = new Typecho_Widget_Helper_Form_Element_Text('GoogleAdClient', NULL, NULL, _t('Google Ad Client ID'), _t('在这里输入Google广告的Client ID，格式为：ca-pub-xxxxxxxxxxxxxxxx，留空则不显示广告'));
 	$form->addInput($GoogleAdClient);
@@ -227,18 +237,18 @@ function themeConfig($form) {
 	echo '<div class="tongzhi col-mb-12 home">备份已更新，请等待自动刷新！如果等不到请点击';
 	?>    
 	<a href="<?php Helper::options()->adminUrl('options-theme.php'); ?>">这里</a></div>
-	<script language="JavaScript">window.setTimeout("location=\'<?php Helper::options()->adminUrl('options-theme.php'); ?>\'", 2500);</script>
+	<script language="JavaScript">window.setTimeout("location='<?php Helper::options()->adminUrl('options-theme.php'); ?>'", 2500);</script>
 	<?php
 	}else{
 	if($ysj){
 		$insert = $db->insert('table.options')
 		->rows(array('name' => 'theme:'.$name.'bf','user' => '0','value' => $ysj));
 		$insertId = $db->query($insert);
-	echo '<div class="tongzhi col-mb-12 home">备份完成，请等待自动刷新！如果等不到请点击';
-	?>    
-	<a href="<?php Helper::options()->adminUrl('options-theme.php'); ?>">这里</a></div>
-	<script language="JavaScript">window.setTimeout("location=\'<?php Helper::options()->adminUrl('options-theme.php'); ?>\'", 2500);</script>
-	<?php
+		echo '<div class="tongzhi col-mb-12 home">备份完成，请等待自动刷新！如果等不到请点击';
+		?>    
+		<a href="<?php Helper::options()->adminUrl('options-theme.php'); ?>">这里</a></div>
+		<script language="JavaScript">window.setTimeout("location='<?php Helper::options()->adminUrl('options-theme.php'); ?>'", 2500);</script>
+		<?php
 	}
 	}
 			}
@@ -251,7 +261,7 @@ function themeConfig($form) {
 	echo '<div class="tongzhi col-mb-12 home">检测到模板备份数据，恢复完成，请等待自动刷新！如果等不到请点击';
 	?>    
 	<a href="<?php Helper::options()->adminUrl('options-theme.php'); ?>">这里</a></div>
-	<script language="JavaScript">window.setTimeout("location=\'<?php Helper::options()->adminUrl('options-theme.php'); ?>\'", 2000);</script>
+	<script language="JavaScript">window.setTimeout("location='<?php Helper::options()->adminUrl('options-theme.php'); ?>'", 2000);</script>
 	<?php
 	}else{
 	echo '<div class="tongzhi col-mb-12 home">没有模板备份数据，恢复不了哦！</div>';
@@ -264,7 +274,7 @@ function themeConfig($form) {
 	echo '<div class="tongzhi col-mb-12 home">删除成功，请等待自动刷新，如果等不到请点击';
 	?>    
 	<a href="<?php Helper::options()->adminUrl('options-theme.php'); ?>">这里</a></div>
-	<script language="JavaScript">window.setTimeout("location=\'<?php Helper::options()->adminUrl('options-theme.php'); ?>\'", 2500);</script>
+	<script language="JavaScript">window.setTimeout("location='<?php Helper::options()->adminUrl('options-theme.php'); ?>'", 2500);</script>
 	<?php
 	}else{
 	echo '<div class="tongzhi col-mb-12 home">不用删了！备份不存在！！！</div>';
@@ -408,7 +418,7 @@ function getCatalog() {
 				}
 			}
 			$index .= '<li><a href="#cl-'.$catalog_item['count'].'" onclick="Catalogswith()">'.$catalog_item['text'].'</a>';
-			$prev_depth = $catalog_item['depth'];
+			$prev_depth = $catalog_depth;
 		}
 		for ($i=0; $i<=$to_depth; $i++) {
 			$index .= '</li>'.PHP_EOL .'</ul>'.PHP_EOL;
@@ -447,10 +457,12 @@ function Contents_Post_Initial($limit = 10, $order = 'created') {
 	$posts = $db->fetchAll($db->select()->from('table.contents')
 		->where('type = ? AND status = ? AND created < ?', 'post', 'publish', $options->time)
 		->order($order, Typecho_Db::SORT_DESC)
-		->limit($limit), array(Typecho_Widget::widget('Widget_Abstract_Contents'), 'filter'));
+		->limit($limit));
 	if ($posts) {
+		$widget = Typecho_Widget::widget('Widget_Abstract_Contents');
 		foreach($posts as $post) {
-			echo '<li><a'.($post['hidden'] && $options->PjaxOption ? '' : ' href="'.$post['permalink'].'"').'>'.htmlspecialchars($post['title']).'</a></li>'.PHP_EOL;
+			$widget->push($post);
+			echo '<li><a'.($widget->hidden && $options->PjaxOption ? '' : ' href="'.$widget->permalink.'"').'>'.htmlspecialchars($widget->title).'</a></li>'.PHP_EOL;
 		}
 	} else {
 		echo '<li>暂无文章</li>'.PHP_EOL;
@@ -486,41 +498,58 @@ class Initial_Widget_Comments_Recent extends Widget_Abstract_Comments
 
 function FindContent($cid) {
 	$db = Typecho_Db::get();
-	return $db->fetchRow($db->select()->from('table.contents')
+	$row = $db->fetchRow($db->select()->from('table.contents')
 	->where('cid = ?', $cid)
-	->limit(1), array(Typecho_Widget::widget('Widget_Abstract_Contents'), 'filter'));
+	->limit(1));
+	if ($row) {
+		$widget = Typecho_Widget::widget('Widget_Abstract_Contents');
+		$widget->push($row);
+		return $row;
+	}
+	return NULL;
 }
 
 function FindContents($val = NULL, $order = 'order', $sort = 'a', $publish = NULL) {
 	$db = Typecho_Db::get();
-	$sort = ($sort == 'a') ? Typecho_Db::SORT_ASC : Typecho_Db::SORT_DESC;
+	$sort_dir = ($sort == 'a') ? Typecho_Db::SORT_ASC : Typecho_Db::SORT_DESC;
 	$select = $db->select()->from('table.contents')
 		->where('created < ?', Helper::options()->time)
-		->order($order, $sort);
+		->order($order, $sort_dir);
 	if ($val) {
 		$select->where('template = ?', $val);
 	}
 	if ($publish) {
 		$select->where('status = ?','publish');
 	}
-	$content = $db->fetchAll($select, array(Typecho_Widget::widget('Widget_Abstract_Contents'), 'filter'));
-	return empty($content) ? NULL : $content;
+	$rows = $db->fetchAll($select);
+	return empty($rows) ? NULL : $rows;
 }
 
 function Whisper($sidebar = NULL) {
 	$db = Typecho_Db::get();
 	$options = Helper::options();
-	$page = FindContents('page-whisper.php', 'commentsNum', 'd');
+	
+	$sort = Typecho_Db::SORT_DESC;
+	$select = $db->select()->from('table.contents')
+		->where('created < ?', $options->time)
+		->where('template = ?', 'page-whisper.php')
+		->order('commentsNum', $sort);
+	$pages = $db->fetchAll($select);
+	
 	$p = $sidebar ? 'li' : 'p';
 	$remind = '';
-	if (Typecho_Widget::widget('Widget_User')->pass('editor', true) && (!$page || isset($page[1]))) {
-		$remind = '<'.$p.' class="notice"><b>仅管理员可见: </b>'.($page ? '发现多个"轻语"模板页面，已自动选取内容较多的页面来展示，请删除多余模板页面。' : '未找到"轻语"模板页面，请创建"轻语"模板页面。').'</'.$p.'>'.PHP_EOL;
+	
+	if (Typecho_Widget::widget('Widget_User')->pass('editor', true) && (!$pages || isset($pages[1]))) {
+		$remind = '<'.$p.' class="notice"><b>仅管理员可见: </b>'.($pages ? '发现多个"轻语"模板页面，已自动选取内容较多的页面来展示，请删除多余模板页面。' : '未找到"轻语"模板页面，请创建"轻语"模板页面。').'</'.$p.'>'.PHP_EOL;
 	}
-	if ($page) {
-		$page = $page[0];
-		$title = $sidebar ? '<h3 class="widget-title">'.$page['title'].'</h3>' : '<h2 class="post-title"><a href="'.$page['permalink'].'">'.$page['title'].'<span class="more">···</span></a></h2>';
+	
+	if ($pages) {
+		$widget = Typecho_Widget::widget('Widget_Abstract_Contents');
+		$widget->push($pages[0]);
+		
+		$title = $sidebar ? '<h3 class="widget-title">'.$widget->title.'</h3>' : '<h2 class="post-title"><a href="'.$widget->permalink.'">'.$widget->title.'<span class="more">···</span></a></h2>';
 		$comment = $db->fetchAll($db->select()->from('table.comments')
-			->where('cid = ? AND status = ? AND parent = ?', $page['cid'], 'approved', '0')
+			->where('cid = ? AND status = ? AND parent = ?', $widget->cid, 'approved', '0')
 			->order('coid', Typecho_Db::SORT_DESC)
 			->limit(1));
 		if ($comment) {
@@ -528,7 +557,7 @@ function Whisper($sidebar = NULL) {
 			if ($options->AttUrlReplace) {
 				$content = UrlReplace($content);
 			}
-			$content = strip_tags($content, '<p><br><strong><a><img><pre><code>'.$options->commentsHTMLTagAllowed).($sidebar ? PHP_EOL .'<li class="more"><a href="'.$page['permalink'].'">查看更多...</a></li>' : '');
+			$content = strip_tags($content, '<p><br><strong><a><img><pre><code>'.$options->commentsHTMLTagAllowed) . ($sidebar ? PHP_EOL .'<li class="more"><a href="'.$widget->permalink.'">查看更多...</a></li>' : '');
 		} else {
 			$content = '<'.$p.'>暂无内容</'.$p.'>';
 		}

@@ -39,6 +39,7 @@ echo $content;
 <div id="gg-post-foot"<?php if (isset($this->options->GoogleAdPostStyle) && $this->options->GoogleAdPostStyle): ?> style="<?php $this->options->GoogleAdPostStyle(); ?>"<?php endif; ?>>
     <?php $this->options->GoogleAdSlotPost(); ?>
 </div>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
 <?php endif; ?>
 <!-- 文章底部广告结束 -->
 <?php if ($this->options->WeChat || $this->options->Alipay): ?>

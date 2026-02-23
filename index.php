@@ -1,12 +1,12 @@
 <?php
 /**
- * Initial - 简约而不简单
+ * Initial-M - 简约而不简单
  * 还原本质 勿忘初心
  * 
- * @package Initial
- * @author JIElive
- * @version 2.5.5
- * @link http://www.offodd.com/
+ * @package Initial-M
+ * @author YuYisir
+ * @version 3.1.0
+ * @link https://www.886a.top/
  */
 if (!defined('__TYPECHO_ROOT_DIR__')) exit;
 $this->need('header.php');

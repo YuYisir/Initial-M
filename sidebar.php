@@ -28,7 +28,20 @@
 <?php $this->widget('Initial_Widget_Comments_Recent', in_array('IgnoreAuthor', $this->options->sidebarBlock) ? 'ignoreAuthor=1' : '')->to($comments); ?>
 <?php if($comments->have()): ?>
 <?php while($comments->next()): ?>
-<li><a <?php echo (FindContent($comments->cid)['hidden'] && $this->options->PjaxOption) || (FindContent($comments->cid)['status'] != 'publish' && FindContent($comments->cid)['template'] != 'page-whisper.php' && $this->authorId !== $this->user->uid && !$this->user->pass('editor', true)) ? '' : 'href="'.$comments->permalink.'" ' ?>title="来自: <?php echo (FindContent($comments->cid)['status'] != 'publish' && FindContent($comments->cid)['template'] != 'page-whisper.php' && $this->authorId !== $this->user->uid && !$this->user->pass('editor', true)) ? '此内容被作者隐藏' : $comments->title ?>"><?php $comments->author(false); ?></a>: <?php $comments->excerpt(35, '...'); ?></li>
+<?php 
+$content_row = FindContent($comments->cid);
+$content_widget = null;
+if ($content_row) {
+	$content_widget = Typecho_Widget::widget('Widget_Abstract_Contents');
+	$content_widget->push($content_row);
+}
+$is_hidden = $content_widget && $content_widget->hidden;
+$is_published = $content_widget && $content_widget->status == 'publish';
+$is_whisper_template = $content_widget && $content_widget->template == 'page-whisper.php';
+$show_link = !($is_hidden && $this->options->PjaxOption) && (!(!$is_published && !$is_whisper_template && $this->authorId !== $this->user->uid && !$this->user->pass('editor', true)));
+$title_text = (!$is_published && !$is_whisper_template && $this->authorId !== $this->user->uid && !$this->user->pass('editor', true)) ? '此内容被作者隐藏' : $comments->title;
+?>
+<li><a <?php echo $show_link ? 'href="'.$comments->permalink.'" ' : '' ?>title="来自: <?php echo $title_text; ?>"><?php $comments->author(false); ?></a>: <?php $comments->excerpt(35, '...'); ?></li>
 <?php endwhile; ?>
 <?php else: ?>
 <li>暂无回复</li>
@@ -50,6 +63,7 @@
 <div class="gg-container"<?php if (isset($this->options->GoogleAdSidebarStyle) && $this->options->GoogleAdSidebarStyle): ?> style="<?php $this->options->GoogleAdSidebarStyle(); ?>"<?php endif; ?>>
     <?php $this->options->GoogleAdSlotSidebar(); ?>
 </div>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
 <?php endif; ?>
 <!-- 侧边栏广告结束 -->
 <?php if (!empty($this->options->sidebarBlock) && in_array('ShowTag', $this->options->sidebarBlock)): ?>
@@ -81,8 +95,12 @@
 <h3 class="widget-title">链接</h3>
 <ul class="widget-tile">
 <?php Links($this->options->IndexLinksSort); ?>
-<?php if (FindContents('page-links.php', 'order', 'a', 1)): ?>
-<li class="more"><a href="<?php echo FindContents('page-links.php', 'order', 'a', 1)[0]['permalink']; ?>">查看更多...</a></li>
+<?php $page_links = FindContents('page-links.php', 'order', 'a', 1);
+if ($page_links):
+	$widget = Typecho_Widget::widget('Widget_Abstract_Contents');
+	$widget->push($page_links[0]);
+?>
+<li class="more"><a href="<?php echo $widget->permalink; ?>">查看更多...</a></li>
 <?php endif; ?>
 </ul>
 </section>
