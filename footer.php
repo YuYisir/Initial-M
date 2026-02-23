@@ -15,7 +15,7 @@ if ($page_links):
 <?php endif; ?>
 </ul>
 <?php endif; ?>
-<p>&copy; <?php echo date('Y'); ?> <a href="<?php $this->options->siteUrl(); ?>"><?php $this->options->title(); ?></a>. Powered by <a href="http://www.typecho.org" target="_blank">Typecho</a> &amp; <a href="http://www.offodd.com/17.html" target="_blank">Initial</a>.</p>
+<p>&copy; <?php echo date('Y'); ?> <a href="<?php $this->options->siteUrl(); ?>"><?php $this->options->title(); ?></a>. Powered by <a href="http://www.typecho.org" target="_blank">Typecho</a> &amp; <a href="https://github.com/YuYisir/Initial-M" target="_blank">Initial-M</a>.</p>
 <!-- 备案开始 -->
 <?php if ($this->options->ICPbeian || (isset($this->options->Gonganbeian) && $this->options->Gonganbeian)): ?>
 <p>
