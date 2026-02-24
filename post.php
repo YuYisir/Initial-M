@@ -12,6 +12,7 @@ if (!empty($this->options->Breadcrumbs) && in_array('Postshow', $this->options->
 <li><?php $this->category(','); ?></li>
 <li><a href="<?php $this->permalink() ?>#comments"><?php $this->commentsNum('暂无评论', '%d 条评论'); ?></a></li>
 <li><?php Postviews($this); ?></li>
+<li>最后更新：<?php echo date('Y-m-d', $this->modified); ?></li>
 </ul>
 <div class="post-content">
 <!-- 回复可见开始 此处注释的为原版内容：?php $this->content(); ?>-->
@@ -50,7 +51,12 @@ echo $content;
 <?php endif; ?>
 <p class="tags">标签: <?php $this->tags(', ', true, 'none'); ?></p>
 <?php if ($this->options->LicenseInfo !== '0'): ?>
-<p class="license"><?php echo $this->options->LicenseInfo ? $this->options->LicenseInfo : '本作品采用 <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="license nofollow">知识共享署名-相同方式共享 4.0 国际许可协议</a> 进行许可。' ?></p>
+<div class="license-box">
+    <p>最后更新于 <?php echo date('Y-m-d', $this->modified); ?> 「部分内容存在时效性，如有失效请留言反馈」</p>
+    <p>除注明外为 <?php $this->options->title(); ?> 原创文章，转载请注明出处。</p>
+    <p><?php echo $this->options->LicenseInfo ? $this->options->LicenseInfo : '本作品采用 <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="license nofollow">知识共享署名-相同方式共享 4.0 国际许可协议</a> 进行许可。' ?></p>
+    <p>本文链接：<a href="<?php $this->permalink(); ?>" target="_blank"><?php $this->permalink(); ?></a></p>
+</div>
 <?php endif; ?>
 </article>
 <?php $this->need('comments.php'); ?>

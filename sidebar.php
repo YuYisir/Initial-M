@@ -8,7 +8,7 @@
 <?php if (!empty($this->options->sidebarBlock) && in_array('ShowHotPosts', $this->options->sidebarBlock)): ?>
 <section class="widget">
 <h3 class="widget-title">热门文章</h3>
-<ul class="widget-list">
+<ul class="widget-list re-posts">
 <?php Contents_Post_Initial($this->options->postsListSize, 'commentsNum'); ?>
 </ul>
 </section>
@@ -16,7 +16,7 @@
 <?php if (!empty($this->options->sidebarBlock) && in_array('ShowRecentPosts', $this->options->sidebarBlock)): ?>
 <section class="widget">
 <h3 class="widget-title">最新文章</h3>
-<ul class="widget-list">
+<ul class="widget-list re-posts">
 <?php Contents_Post_Initial($this->options->postsListSize); ?>
 </ul>
 </section>
@@ -24,7 +24,7 @@
 <?php if (!empty($this->options->sidebarBlock) && in_array('ShowRecentComments', $this->options->sidebarBlock)): ?>
 <section class="widget">
 <h3 class="widget-title">最近回复</h3>
-<ul class="widget-list">
+<ul class="widget-list rec-com-list">
 <?php $this->widget('Initial_Widget_Comments_Recent', in_array('IgnoreAuthor', $this->options->sidebarBlock) ? 'ignoreAuthor=1' : '')->to($comments); ?>
 <?php if($comments->have()): ?>
 <?php while($comments->next()): ?>
@@ -41,7 +41,7 @@ $is_whisper_template = $content_widget && $content_widget->template == 'page-whi
 $show_link = !($is_hidden && $this->options->PjaxOption) && (!(!$is_published && !$is_whisper_template && $this->authorId !== $this->user->uid && !$this->user->pass('editor', true)));
 $title_text = (!$is_published && !$is_whisper_template && $this->authorId !== $this->user->uid && !$this->user->pass('editor', true)) ? '此内容被作者隐藏' : $comments->title;
 ?>
-<li><a <?php echo $show_link ? 'href="'.$comments->permalink.'" ' : '' ?>title="来自: <?php echo $title_text; ?>"><?php $comments->author(false); ?></a>: <?php $comments->excerpt(35, '...'); ?></li>
+<li><a <?php echo $show_link ? 'href="'.$comments->permalink.'" ' : '' ?>title="来自: <?php echo $title_text; ?>"><span class="comment-author-name"><?php $comments->author(false); ?></span><span class="comment-text">: <?php $comments->excerpt(35, '...'); ?></span></a></li>
 <?php endwhile; ?>
 <?php else: ?>
 <li>暂无回复</li>
