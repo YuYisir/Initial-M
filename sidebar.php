@@ -8,7 +8,7 @@
 <?php if (!empty($this->options->sidebarBlock) && in_array('ShowHotPosts', $this->options->sidebarBlock)): ?>
 <section class="widget">
 <h3 class="widget-title">热门文章</h3>
-<ul class="widget-list re-posts">
+<ul class="widget-list rec-post-list">
 <?php Contents_Post_Initial($this->options->postsListSize, 'commentsNum'); ?>
 </ul>
 </section>
@@ -16,8 +16,16 @@
 <?php if (!empty($this->options->sidebarBlock) && in_array('ShowRecentPosts', $this->options->sidebarBlock)): ?>
 <section class="widget">
 <h3 class="widget-title">最新文章</h3>
-<ul class="widget-list re-posts">
+<ul class="widget-list rec-post-list">
 <?php Contents_Post_Initial($this->options->postsListSize); ?>
+</ul>
+</section>
+<?php endif; ?>
+<?php if (!empty($this->options->sidebarBlock) && in_array('ShowRandomPosts', $this->options->sidebarBlock)): ?>
+<section class="widget">
+<h3 class="widget-title">随机文章</h3>
+<ul class="widget-list rec-post-list">
+<?php Contents_Post_Random($this->options->postsListSize); ?>
 </ul>
 </section>
 <?php endif; ?>
@@ -102,6 +110,18 @@ if ($page_links):
 ?>
 <li class="more"><a href="<?php echo $widget->permalink; ?>">查看更多...</a></li>
 <?php endif; ?>
+</ul>
+</section>
+<?php endif; ?>
+<?php if (!empty($this->options->sidebarBlock) && in_array('ShowSiteStats', $this->options->sidebarBlock)): ?>
+<section class="widget">
+<h3 class="widget-title">站点统计</h3>
+<ul class="widget-list site-stats">
+<?php $stats = getSiteStats(); ?>
+<li>文章数量：<?php echo $stats['posts']; ?></li>
+<li>评论数量：<?php echo $stats['comments']; ?></li>
+<li>已运行：<?php echo $stats['runtime']; ?></li>
+<li>总计码字：<?php echo $stats['words']; ?></li>
 </ul>
 </section>
 <?php endif; ?>

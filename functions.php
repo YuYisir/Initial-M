@@ -164,14 +164,25 @@ function themeConfig($form) {
 	$sidebarBlock = new Typecho_Widget_Helper_Form_Element_Checkbox('sidebarBlock', 
 	array('ShowHotPosts' => _t('显示热门文章（根据评论数量排序）'),
 	'ShowRecentPosts' => _t('显示最新文章'),
+	'ShowRandomPosts' => _t('显示随机文章'),
 	'ShowRecentComments' => _t('显示最近回复'),
 	'IgnoreAuthor' => _t('↪不显示作者回复'),
 	'ShowCategory' => _t('显示分类'),
 	'ShowTag' => _t('显示标签'),
 	'ShowArchive' => _t('显示归档'),
+	'ShowSiteStats' => _t('显示站点统计'),
 	'ShowOther' => _t('显示其它杂项')),
 	array('ShowRecentPosts', 'ShowRecentComments', 'ShowCategory', 'ShowTag', 'ShowArchive', 'ShowOther'), _t('侧边栏显示'));
 	$form->addInput($sidebarBlock->multiMode());
+
+	$SiteStatsDateType = new Typecho_Widget_Helper_Form_Element_Radio('SiteStatsDateType',
+	array('first' => _t('使用第一篇文章日期'),
+	'custom' => _t('使用自定义日期')),
+	'first', _t('站点运行时间起始日期'), _t('选择站点运行时间的计算方式'));
+	$form->addInput($SiteStatsDateType);
+
+	$SiteStatsCustomDate = new Typecho_Widget_Helper_Form_Element_Text('SiteStatsCustomDate', NULL, NULL, _t('自定义起始日期'), _t('格式：2024-01-01，仅在选择\"使用自定义日期\"时生效'));
+	$form->addInput($SiteStatsCustomDate);
 
 	$OneCOL = new Typecho_Widget_Helper_Form_Element_Radio('OneCOL', 
 	array(1 => _t('启用'),
@@ -369,6 +380,64 @@ function Postviews($archive) {
 	echo $exist == 0 ? '暂无阅读' : $exist.' 次阅读';
 }
 
+function getSiteStats() {
+    $db = Typecho_Db::get();
+    $stat = Typecho_Widget::widget('Widget_Stat');
+    $options = Helper::options();
+    
+    $stats = array();
+    
+    $stats['posts'] = $stat->publishedPostsNum;
+    
+    $commentCount = $db->fetchObject($db->select(array('COUNT(coid)' => 'num'))
+        ->from('table.comments')
+        ->where('status = ?', 'approved'));
+    $stats['comments'] = $commentCount->num;
+    
+    $startTime = 0;
+    
+    if ($options->SiteStatsDateType == 'custom' && !empty($options->SiteStatsCustomDate)) {
+        $startTime = strtotime($options->SiteStatsCustomDate);
+    }
+    
+    if ($startTime <= 0) {
+        $firstPost = $db->fetchRow($db->select('created')->from('table.contents')
+            ->where('type = ?', 'post')
+            ->where('status = ?', 'publish')
+            ->order('created', Typecho_Db::SORT_ASC)
+            ->limit(1));
+        if ($firstPost) {
+            $startTime = $firstPost['created'];
+        }
+    }
+    
+    if ($startTime > 0) {
+        $days = floor((time() - $startTime) / 86400);
+        $stats['runtime'] = $days . ' 天';
+    } else {
+        $stats['runtime'] = '0 天';
+    }
+    
+    $totalWords = 0;
+    $posts = $db->fetchAll($db->select('text')->from('table.contents')
+        ->where('type = ?', 'post')
+        ->where('status = ?', 'publish'));
+    foreach ($posts as $post) {
+        $text = strip_tags($post['text']);
+        $text = preg_replace('/\[.*?\]/', '', $text);
+        $text = preg_replace('/\s/', '', $text);
+        $totalWords += mb_strlen($text, 'UTF-8');
+    }
+    
+    if ($totalWords >= 10000) {
+        $stats['words'] = round($totalWords / 10000, 1) . ' 万字';
+    } else {
+        $stats['words'] = $totalWords . ' 字';
+    }
+    
+    return $stats;
+}
+
 function Breadcrumbs($archive) {
 	$options = Helper::options();
 	if (!empty($options->Breadcrumbs) && in_array('Pageshow', $options->Breadcrumbs)) {
@@ -457,6 +526,24 @@ function Contents_Post_Initial($limit = 10, $order = 'created') {
 	$posts = $db->fetchAll($db->select()->from('table.contents')
 		->where('type = ? AND status = ? AND created < ?', 'post', 'publish', $options->time)
 		->order($order, Typecho_Db::SORT_DESC)
+		->limit($limit));
+	if ($posts) {
+		$widget = Typecho_Widget::widget('Widget_Abstract_Contents');
+		foreach($posts as $post) {
+			$widget->push($post);
+			echo '<li><a'.($widget->hidden && $options->PjaxOption ? '' : ' href="'.$widget->permalink.'"').'>'.htmlspecialchars($widget->title).'</a></li>'.PHP_EOL;
+		}
+	} else {
+		echo '<li>暂无文章</li>'.PHP_EOL;
+	}
+}
+
+function Contents_Post_Random($limit = 10) {
+	$db = Typecho_Db::get();
+	$options = Helper::options();
+	$posts = $db->fetchAll($db->select()->from('table.contents')
+		->where('type = ? AND status = ? AND created < ?', 'post', 'publish', $options->time)
+		->order('RAND()')
 		->limit($limit));
 	if ($posts) {
 		$widget = Typecho_Widget::widget('Widget_Abstract_Contents');
