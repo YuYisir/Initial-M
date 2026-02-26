@@ -1,20 +1,31 @@
 <?php if (!defined('__TYPECHO_ROOT_DIR__')) exit;
 $this->need('header.php');
 if (!empty($this->options->Breadcrumbs) && in_array('Postshow', $this->options->Breadcrumbs)): ?>
-<div class="breadcrumbs">
-<a href="<?php $this->options->siteUrl(); ?>">首页</a> &raquo; <?php $this->category(); ?> &raquo; <?php echo !empty($this->options->Breadcrumbs) && in_array('Text', $this->options->Breadcrumbs) ? '正文' : $this->title; ?>
+<div class="breadcrumbs" itemscope itemtype="https://schema.org/BreadcrumbList">
+<span itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+<a href="<?php $this->options->siteUrl(); ?>" itemprop="item"><span itemprop="name">首页</span></a>
+<meta itemprop="position" content="1" />
+</span> &raquo; 
+<span itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+<?php $this->category(); ?>
+<meta itemprop="position" content="2" />
+</span> &raquo; 
+<span itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+<span itemprop="name"><?php echo !empty($this->options->Breadcrumbs) && in_array('Text', $this->options->Breadcrumbs) ? '正文' : $this->title; ?></span>
+<meta itemprop="position" content="3" />
+</span>
 </div>
 <?php endif; ?>
-<article class="post<?php if ($this->options->PjaxOption && $this->hidden): ?> protected<?php endif; ?>">
-<h1 class="post-title"><a href="<?php $this->permalink() ?>"><?php $this->title() ?></a></h1>
+<article class="post<?php if ($this->options->PjaxOption && $this->hidden): ?> protected<?php endif; ?>" itemscope itemtype="https://schema.org/Article">
+<h1 class="post-title" itemprop="headline"><a href="<?php $this->permalink() ?>" itemprop="url"><?php $this->title() ?></a></h1>
 <ul class="post-meta">
-<li><?php $this->date(); ?></li>
+<li itemprop="datePublished" content="<?php $this->date('c'); ?>"><?php $this->date(); ?></li>
 <li><?php $this->category(','); ?></li>
-<li><a href="<?php $this->permalink() ?>#comments"><?php $this->commentsNum('暂无评论', '%d 条评论'); ?></a></li>
+<li><a href="<?php $this->permalink() ?>#comments" itemprop="commentCount"><?php $this->commentsNum('暂无评论', '%d 条评论'); ?></a></li>
 <li><?php Postviews($this); ?></li>
-<li>最后更新：<?php echo date('Y-m-d', $this->modified); ?></li>
+<li>最后更新：<span itemprop="dateModified" content="<?php echo date('c', $this->modified); ?>"><?php echo date('Y-m-d', $this->modified); ?></span></li>
 </ul>
-<div class="post-content">
+<div class="post-content" itemprop="articleBody">
 <!-- 回复可见开始 此处注释的为原版内容：?php $this->content(); ?>-->
 <?php
 $db = Typecho_Db::get();
