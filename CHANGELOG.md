@@ -9,6 +9,11 @@
 - **post.php**: 修复了Google Rich Results测试中发现的结构化数据问题
 - **post.php**: 修复了面包屑导航中缺少item字段的问题
 
+#### 2. 主题设置选项默认值兼容性修复
+- **functions.php**: 修复了后台设置中"首页显示链接"、"显示最新的'轻语'"、"侧边栏显示"等选项无法选中的问题
+- **functions.php**: 为`ShowLinks`选项添加了默认值`array('footer')`，确保页脚默认显示链接模块
+- **functions.php**: 为`ShowWhisper`选项添加了默认值`array('sidebar')`，确保侧边栏默认显示轻语模块
+
 
 ## v3.1.2 (2026-02-26)
 
