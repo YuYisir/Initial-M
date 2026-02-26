@@ -24,6 +24,18 @@ function themeConfig($form) {
 	$favicon = new Typecho_Widget_Helper_Form_Element_Text('favicon', NULL, NULL, _t('Favicon 地址'), _t('在这里填入一个图片 URL 地址, 以添加一个Favicon，留空则不单独设置Favicon'));
 	$form->addInput($favicon);
 
+	$defaultCover = new Typecho_Widget_Helper_Form_Element_Text('defaultCover', NULL, NULL, _t('SEO-默认封面图片'), _t('【网站不显示】用于没有自定义封面的页面，通过 og:image 标签提供给搜索引擎和社交平台，建议尺寸1200x630px。'));
+	$form->addInput($defaultCover);
+
+	$homeCover = new Typecho_Widget_Helper_Form_Element_Text('homeCover', NULL, NULL, _t('SEO-首页封面图片'), _t('【网站不显示】专门用于首页，通过 og:image 标签提供给搜索引擎和社交平台，建议使用品牌形象图片。'));
+	$form->addInput($homeCover);
+
+	$autoFetchCover = new Typecho_Widget_Helper_Form_Element_Radio('autoFetchCover', 
+	array(1 => _t('启用'),
+	0 => _t('关闭')),
+	1, _t('SEO-自动抓取封面图'), _t('【网站不显示】自动抓取文章正文中的第一张图片作为封面图，通过 og:image 标签提供给搜索引擎和社交平台。'));
+	$form->addInput($autoFetchCover);
+
 	$CustomCSS = new Typecho_Widget_Helper_Form_Element_Textarea('CustomCSS', NULL, NULL, _t('自定义样式'), _t('在这里填入你的自定义样式（直接填入css，无需&lt;style&gt;标签）'));
 	$form->addInput($CustomCSS);
 

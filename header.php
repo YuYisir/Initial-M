@@ -15,6 +15,73 @@
 'date'      =>  _t('在 %s 发布的文章'),
 'author'    =>  _t('作者 %s 发布的文章')
 ), '', ' - '); ?><?php $this->options->title(); if ($this->is('index') && $this->options->subTitle): ?> - <?php $this->options->subTitle(); endif; ?></title>
+<meta name="author" content="<?php $this->author(); ?>" />
+<!-- Robots Meta Tag -->
+<meta name="robots" content="index, follow" />
+<?php
+/** * 1. 统一描述 (Description) 获取与清洗逻辑 
+ */
+$desc = '';
+if ($this->is('post') || $this->is('page')) {
+    // 优先从自定义字段 description 读取，否则取摘要
+    $desc = !empty($this->fields->description) ? $this->fields->description : $this->excerpt;
+} else {
+    $desc = $this->options->description;
+}
+// 清洗数据：去掉 HTML 标签、换行符、多余空格，并转义双引号防止 JSON 报错
+$desc = str_replace(["\r", "\n", "\t", '"'], ' ', strip_tags($desc));
+$desc = mb_substr(trim($desc), 0, 150, 'utf-8'); // 限制 150 字以内
+
+/** * 2. 统一封面图 (Image) 获取逻辑 
+ */
+$cover = '';
+if ($this->is('post') || $this->is('page')) {
+    if (!empty($this->fields->thumb)) {
+        $cover = $this->fields->thumb;
+    } elseif ($this->options->autoFetchCover && preg_match('/<img.*?src="(.*?)"/', $this->content, $matches)) {
+        $cover = $matches[1];
+    } else {
+        $cover = $this->options->defaultCover ? $this->options->defaultCover : $this->options->themeUrl . '/img/default-cover.webp';
+    }
+} elseif ($this->is('index')) {
+    $cover = $this->options->homeCover ? $this->options->homeCover : $this->options->themeUrl . '/img/home-cover.webp';
+} else {
+    $cover = $this->options->defaultCover ? $this->options->defaultCover : $this->options->themeUrl . '/img/default-cover.webp';
+}
+?>
+
+<meta name="description" content="<?php echo $desc; ?>" />
+<meta property="og:image" content="<?php echo $cover; ?>" />
+
+<?php if ($this->is('index') || $this->is('post') || $this->is('page')): ?>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "<?php echo $this->is('post') ? 'BlogPosting' : ($this->is('page') ? 'WebPage' : 'WebSite'); ?>",
+  "name": "<?php $this->archiveTitle('', '', ''); ?>",
+  "description": "<?php echo $desc; ?>",
+  "url": "<?php $this->permalink(); ?>",
+  "image": "<?php echo $cover; ?>",
+  "publisher": {
+    "@type": "Organization",
+    "name": "<?php $this->options->title(); ?>",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "<?php echo $this->options->logoUrl ? $this->options->logoUrl : $this->options->siteUrl . 'logo.png'; ?>"
+    }
+  }
+  <?php if ($this->is('post') || $this->is('page')): ?>
+  ,"datePublished": "<?php $this->date('c'); ?>",
+  "dateModified": "<?php echo date('c', $this->modified); ?>",
+  "author": {
+    "@type": "Person",
+    "name": "<?php $this->author(); ?>"
+  }
+  <?php endif; ?>
+}
+</script>
+<?php endif; ?>
+
 <?php $this->header('generator=&template=&pingback=&xmlrpc=&wlw=&commentReply=&rss1=&rss2=&antiSpam=&atom='); ?>
 <link rel="stylesheet" href="<?php cjUrl('style.min.css') ?>" />
 <?php if ($this->options->CustomCSS): ?>
