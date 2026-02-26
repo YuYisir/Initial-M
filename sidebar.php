@@ -68,7 +68,7 @@ $title_text = (!$is_published && !$is_whisper_template && $this->authorId !== $t
 <?php endif; ?>
 <!-- 侧边栏广告开始 -->
 <?php if (isset($this->options->GoogleAdClient) && $this->options->GoogleAdClient && isset($this->options->GoogleAdSlotSidebar) && $this->options->GoogleAdSlotSidebar): ?>
-<div class="gg-container"<?php if (isset($this->options->GoogleAdSidebarStyle) && $this->options->GoogleAdSidebarStyle): ?> style="<?php $this->options->GoogleAdSidebarStyle(); ?>"<?php endif; ?>>
+<div class="gg-container  widget"<?php if (isset($this->options->GoogleAdSidebarStyle) && $this->options->GoogleAdSidebarStyle): ?> style="<?php $this->options->GoogleAdSidebarStyle(); ?>"<?php endif; ?>>
     <?php $this->options->GoogleAdSlotSidebar(); ?>
 </div>
 <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
