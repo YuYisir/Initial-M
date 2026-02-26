@@ -778,7 +778,6 @@ class myyodux {
 }
 }/*回复可见样式结束*/
 /* 增加评论验证*/
-$comment = spam_protection_pre($comment, $post, $result);
 function spam_protection_math() {
     $num1 = rand(1, 15);
     $num2 = rand(1, 15);
@@ -786,22 +785,27 @@ function spam_protection_math() {
     echo "<input type=\"hidden\" name=\"num1\" value=\"$num1\">\n";
     echo "<input type=\"hidden\" name=\"num2\" value=\"$num2\">";
 }
-function spam_protection_pre($comment, $post, $result) {
-    if ($_REQUEST['text'] != null) {
-        If($_POST['num1'] == null || $_POST['num2'] == null) {
-            throw new Typecho_Widget_Exception(_t('验证码异常.', '评论失败'));
-        } else {
-            $sum = $_POST['sum'];
-            switch ($sum) {
-            case $_POST['num1'] + $_POST['num2'] : break;
-            case null:
-                throw new Typecho_Widget_Exception(_t('请输入验证码.', '评论失败'));
-                break;
-            default:
-                throw new Typecho_Widget_Exception(_t('验证码错误.', '评论失败'));
+/* 增加评论验证结束*/
+
+// 注册评论验证码验证
+Typecho_Plugin::factory('Widget_Feedback')->comment = array('CommentProtection', 'verify');
+Typecho_Plugin::factory('Widget_Feedback')->trackback = array('CommentProtection', 'verify');
+Typecho_Plugin::factory('Widget_Feedback')->pingback = array('CommentProtection', 'verify');
+
+class CommentProtection {
+    public static function verify($comment, $post, $result) {
+        if ($_REQUEST['text'] != null) {
+            if($_POST['num1'] == null || $_POST['num2'] == null) {
+                throw new Typecho_Widget_Exception(_t('验证码异常.', '评论失败'));
+            } else {
+                $sum = $_POST['sum'];
+                if ($sum == null) {
+                    throw new Typecho_Widget_Exception(_t('请输入验证码.', '评论失败'));
+                } elseif ($sum != ($_POST['num1'] + $_POST['num2'])) {
+                    throw new Typecho_Widget_Exception(_t('验证码错误.', '评论失败'));
+                }
             }
         }
+        return $comment;
     }
-    return $comment;
 }
-/* 增加评论验证结束*/

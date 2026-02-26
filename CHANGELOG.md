@@ -1,5 +1,57 @@
 # Initial-M主题更新日志
 
+## v3.1.2 (2026-02-26)
+
+### 主要修复内容
+
+#### 1. 验证码代码优化与错误修复
+- **functions.php**: 删除错误的全局作用域函数调用 `$comment = spam_protection_pre($comment, $post, $result);`，该调用会导致变量未定义错误
+- **functions.php**: 删除旧的 `spam_protection_pre()` 函数，避免代码重复
+- **functions.php**: 创建新的 `CommentProtection` 验证类，提供更规范的验证码验证逻辑
+- **functions.php**: 通过 Typecho 插件工厂正确注册验证逻辑，确保在评论提交时自动触发验证
+
+### 主要功能更新
+
+#### 1. 文章排版样式优化
+- **style.min.css**: 新增 `.widget-title` 样式优化，添加下划线和装饰效果
+- **style.min.css**: 新增 `.post-content p` 段落样式，设置段落间距和对齐方式
+- **style.min.css**: 新增 `.post-content h2`、`.post-content h3`、`.post-content h4` 标题样式，优化标题层级和间距
+- **style.min.css**: 新增 `.post-content blockquote` 引用样式，添加背景色和左侧边框
+- **style.min.css**: 新增 `.post-content ul`、`.post-content ol`、`.post-content li` 列表样式，优化列表项间距和悬停效果
+- **style.min.css**: 新增 `.post-content img` 图片样式，添加阴影效果和居中显示
+- **style.min.css**: 新增 `.post-content table` 表格样式，优化表格布局和悬停效果
+- **style.min.css**: 新增 `.post-content hr` 分隔线样式，调整分隔线宽度
+- **style.min.css**: 新增响应式设计的媒体查询，在不同屏幕尺寸下自动调整样式
+- **修改效果**: 文章内容排版更加美观，阅读体验显著提升，支持响应式布局
+
+### 技术变更
+
+#### 1. 验证码实现优化
+- **优化方式**: 将验证码验证逻辑从简单函数改为规范的类实现
+- **注册方式**: 使用 Typecho 插件工厂钩子注册验证函数，符合 Typecho 开发标准
+- **验证时机**: 验证逻辑在评论提交时自动触发，而非在主题加载时调用
+- **代码质量**: 代码结构更清晰，逻辑更规范，符合现代 PHP 开发标准
+
+#### 2. 样式代码优化
+- **响应式设计**: 实现完整的响应式排版，适配不同屏幕尺寸
+- **视觉效果**: 通过阴影、边框、颜色等元素提升视觉层次感
+- **用户体验**: 优化交互反馈，如链接悬停、表格行悬停等效果
+
+## v3.1.1 (2026-02-25)
+
+### 侧边栏样式与功能优化
+
+#### 1. 新增随机文章模块
+- **functions.php**: 新增 `Contents_Post_Random()` 函数，实现随机文章获取
+- **sidebar.php**: 新增随机文章侧边栏模块，显示随机文章列表
+- **修改效果**: 侧边栏现在可以显示随机文章推荐，增加网站内容曝光率
+
+#### 2. 新增统计模块
+- **functions.php**: 新增 `getSiteStats()` 函数，实现网站统计功能，包括文章数量、评论数量、运行时间、总计码字
+- **functions.php**: 新增站点运行时间设置选项，支持使用第一篇文章日期或自定义日期
+- **sidebar.php**: 新增统计模块侧边栏，显示网站各项统计数据
+- **修改效果**: 侧边栏现在可以显示网站统计信息
+
 ## v3.1.0 (2026-02-23)
 
 ### 主要功能更新
