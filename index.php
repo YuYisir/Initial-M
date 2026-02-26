@@ -5,7 +5,7 @@
  * 
  * @package Initial-M
  * @author YuYisir
- * @version 3.1.2
+ * @version 3.2.0
  * @link https://www.886a.top/
  */
 if (!defined('__TYPECHO_ROOT_DIR__')) exit;

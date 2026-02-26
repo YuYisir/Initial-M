@@ -1,5 +1,15 @@
 # Initial-M主题更新日志
 
+## v3.2.0 (2026-02-26)
+
+#### 1. 白屏问题修复
+- **header.php**: 修复了由于变量未定义和JSON语法错误导致的白屏问题
+- **header.php**: 添加了完善的容错处理，确保即使某些选项未设置也能正常运行
+- **header.php**: 修复了Google Rich Results测试中发现的结构化数据问题
+- **post.php**: 修复了Google Rich Results测试中发现的结构化数据问题
+- **post.php**: 修复了面包屑导航中缺少item字段的问题
+
+
 ## v3.1.2 (2026-02-26)
 
 ### 主要修复内容
@@ -9,13 +19,6 @@
 - **functions.php**: 删除旧的 `spam_protection_pre()` 函数，避免代码重复
 - **functions.php**: 创建新的 `CommentProtection` 验证类，提供更规范的验证码验证逻辑
 - **functions.php**: 通过 Typecho 插件工厂正确注册验证逻辑，确保在评论提交时自动触发验证
-
-#### 2. 白屏问题修复
-- **header.php**: 修复了由于变量未定义和JSON语法错误导致的白屏问题
-- **header.php**: 添加了完善的容错处理，确保即使某些选项未设置也能正常运行
-- **header.php**: 修复了Google Rich Results测试中发现的结构化数据问题
-- **post.php**: 修复了Google Rich Results测试中发现的结构化数据问题
-- **post.php**: 修复了面包屑导航中缺少item字段的问题
 
 ### 主要功能更新
 
