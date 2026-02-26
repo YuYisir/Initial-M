@@ -68,7 +68,7 @@ if ($this->is('post') || $this->is('page')) {
     "name": "<?php $this->options->title(); ?>",
     "logo": {
       "@type": "ImageObject",
-	  "url": "<?php echo $this->options->logoUrl ? $this->options->logoUrl : $this->options->themeUrl . '/img/logo2.png'; ?>"
+	  "url": "<?php echo $this->options->logoUrl ? $this->options->logoUrl : $this->options->themeUrl . '/img/logo.webp'; ?>"
     }
   }
   <?php if ($this->is('post') || $this->is('page')): ?>
