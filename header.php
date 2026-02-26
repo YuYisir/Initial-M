@@ -59,6 +59,7 @@ if ($this->is('post') || $this->is('page')) {
   "@context": "https://schema.org",
   "@type": "<?php echo $this->is('post') ? 'BlogPosting' : ($this->is('page') ? 'WebPage' : 'WebSite'); ?>",
   "name": "<?php $this->archiveTitle('', '', ''); ?>",
+  "headline": "<?php $this->archiveTitle('', '', ''); ?>",
   "description": "<?php echo $desc; ?>",
   "url": "<?php $this->permalink(); ?>",
   "image": "<?php echo $cover; ?>",
@@ -67,7 +68,7 @@ if ($this->is('post') || $this->is('page')) {
     "name": "<?php $this->options->title(); ?>",
     "logo": {
       "@type": "ImageObject",
-      "url": "<?php echo $this->options->logoUrl ? $this->options->logoUrl : $this->options->siteUrl . 'logo.png'; ?>"
+	  "url": "<?php echo $this->options->logoUrl ? $this->options->logoUrl : $this->options->themeUrl . '/img/logo2.png'; ?>"
     }
   }
   <?php if ($this->is('post') || $this->is('page')): ?>
@@ -75,7 +76,8 @@ if ($this->is('post') || $this->is('page')) {
   "dateModified": "<?php echo date('c', $this->modified); ?>",
   "author": {
     "@type": "Person",
-    "name": "<?php $this->author(); ?>"
+    "name": "<?php $this->author(); ?>",
+    "url": "<?php $this->author->permalink(); ?>"
   }
   <?php endif; ?>
 }

@@ -13,6 +13,9 @@
 #### 2. 白屏问题修复
 - **header.php**: 修复了由于变量未定义和JSON语法错误导致的白屏问题
 - **header.php**: 添加了完善的容错处理，确保即使某些选项未设置也能正常运行
+- **header.php**: 修复了Google Rich Results测试中发现的结构化数据问题
+- **post.php**: 修复了Google Rich Results测试中发现的结构化数据问题
+- **post.php**: 修复了面包屑导航中缺少item字段的问题
 
 ### 主要功能更新
 

@@ -39,7 +39,7 @@ function themeConfig($form) {
 	$CustomCSS = new Typecho_Widget_Helper_Form_Element_Textarea('CustomCSS', NULL, NULL, _t('自定义样式'), _t('在这里填入你的自定义样式（直接填入css，无需&lt;style&gt;标签）'));
 	$form->addInput($CustomCSS);
 
-	$cjcdnAddress = new Typecho_Widget_Helper_Form_Element_Text('cjcdnAddress', NULL, NULL, _t('主题静态文件（css和js）的链接地址替换'), _t('请输入你的CDN云存储地址，例如：<b class="notice">//cdn.jsdelivr.net/gh/jielive/initial/</b><br><b>被替换的原地址为主题文件位置，即：http://www.example.com/usr/themes/initial/</b>'));
+	$cjcdnAddress = new Typecho_Widget_Helper_Form_Element_Text('cjcdnAddress', NULL, NULL, _t('主题静态文件（css和js）的链接地址替换'), _t('请输入你的CDN云存储地址，例如：<b class="notice">//cdn.jsdelivr.net/gh/jielive/initial/</b><br><b>被替换的原地址为主题文件位置，即：http://www.example.com/usr/themes/initial-M/</b>'));
 	$form->addInput($cjcdnAddress);
 
 	$AttUrlReplace = new Typecho_Widget_Helper_Form_Element_Textarea('AttUrlReplace', NULL, NULL, _t('文章内的链接地址替换（建议用在图片等静态资源的链接上）'), _t('按照格式输入你的CDN链接以替换原链接，格式：<br><b class="notice">原地址=替换地址</b><br>原地址与新地址之间用等号“=”分隔，例如：<br><b>http://www.example.com/usr/uploads/=http://cdn.example.com/usr/uploads/</b><br>可设置多个规则，换行即可，一行一个'));
