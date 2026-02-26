@@ -1,13 +1,41 @@
 <?php if (!defined('__TYPECHO_ROOT_DIR__')) exit;
+// 确保$cover变量存在
+if (!isset($cover)) {
+    $cover = '';
+    if ($this->is('post') || $this->is('page')) {
+        if (!empty($this->fields->thumb)) {
+            $cover = $this->fields->thumb;
+        } elseif ($this->options->autoFetchCover && preg_match('/<img.*?src="(.*?)"/', $this->content, $matches)) {
+            $cover = $matches[1];
+        } else {
+            $cover = $this->options->defaultCover ? $this->options->defaultCover : $this->options->themeUrl . '/img/default-cover.webp';
+        }
+    }
+}
 $this->need('header.php');
 if (!empty($this->options->Breadcrumbs) && in_array('Postshow', $this->options->Breadcrumbs)): ?>
+<?php
+// 简化的面包屑导航实现
+$categoryName = '未分类';
+$categoryPermalink = '';
+// 尝试获取第一个分类
+if (isset($this->categories) && count($this->categories) > 0) {
+    $firstCategory = reset($this->categories);
+    $categoryName = $firstCategory['name'];
+    $categoryPermalink = $firstCategory['permalink'];
+}
+?>
 <div class="breadcrumbs" itemscope itemtype="https://schema.org/BreadcrumbList">
 <span itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
 <a href="<?php $this->options->siteUrl(); ?>" itemprop="item"><span itemprop="name">首页</span></a>
 <meta itemprop="position" content="1" />
 </span> &raquo; 
 <span itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
-<?php $this->category(); ?>
+<?php if (!empty($categoryPermalink)): ?>
+<a href="<?php echo $categoryPermalink; ?>" itemprop="item"><span itemprop="name"><?php echo $categoryName; ?></span></a>
+<?php else: ?>
+<span itemprop="name"><?php echo $categoryName; ?></span>
+<?php endif; ?>
 <meta itemprop="position" content="2" />
 </span> &raquo; 
 <span itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
@@ -17,6 +45,11 @@ if (!empty($this->options->Breadcrumbs) && in_array('Postshow', $this->options->
 </div>
 <?php endif; ?>
 <article class="post<?php if ($this->options->PjaxOption && $this->hidden): ?> protected<?php endif; ?>" itemscope itemtype="https://schema.org/Article">
+<meta itemprop="image" content="<?php echo $cover; ?>" />
+<div itemprop="author" itemscope itemtype="https://schema.org/Person">
+<meta itemprop="name" content="<?php $this->author(); ?>" />
+<meta itemprop="url" content="<?php $this->author->permalink(); ?>" />
+</div>
 <h1 class="post-title" itemprop="headline"><a href="<?php $this->permalink() ?>" itemprop="url"><?php $this->title() ?></a></h1>
 <ul class="post-meta">
 <li itemprop="datePublished" content="<?php $this->date('c'); ?>"><?php $this->date(); ?></li>
@@ -38,8 +71,7 @@ $sql = $db->select()->from('table.comments')
 $result = $db->fetchAll($sql);
 if($this->user->hasLogin() || $result) {
     $content = preg_replace("/\[hidden\](.*?)\[\/hidden\]/sm",'<div class="reply2view">$1</div>',$this->content);
-}
-else{
+} else{
     $content = preg_replace("/\[hidden\](.*?)\[\/hidden\]/sm",'<div class="reply2view">此处内容需要评论回复后方可阅读</div>',$this->content);
 }
 echo $content;
