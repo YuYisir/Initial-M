@@ -1,4 +1,4 @@
-# Typecho主题 - Initial-M 简约而不简单（v3.1.2）
+# Typecho主题 - Initial-M 简约而不简单（v3.2.0）
 
 ## 分支说明
 
