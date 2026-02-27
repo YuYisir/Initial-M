@@ -1,6 +1,6 @@
 # Initial-M — Typecho 简约 SEO 博客主题 🚀  
 
-![Version](https://img.shields.io/badge/version-3.1.3-blue)
+![Version](https://img.shields.io/badge/version-3.2.0-blue)
 ![Typecho](https://img.shields.io/badge/Typecho-1.1--1.3-green)
 ![License](https://img.shields.io/badge/license-MIT-brightgreen)
 
@@ -60,7 +60,7 @@
 
 ## 📈 当前版本更新日志
 
-**当前版本：v3.1.3 (2026-02-27)**
+**当前版本：v3.2.0 (2026-02-26)**
 
 - 修复白屏问题
 - 修复结构化数据问题
