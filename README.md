@@ -1,5 +1,7 @@
 # Initial-M — Typecho 简约 SEO 博客主题 🚀  
 
+![主题封面](screenshot.png)
+
 ![Version](https://img.shields.io/badge/version-3.2.0-blue)
 ![Typecho](https://img.shields.io/badge/Typecho-1.1--1.3-green)
 ![License](https://img.shields.io/badge/license-MIT-brightgreen)
