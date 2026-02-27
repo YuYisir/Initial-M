@@ -1,7 +1,7 @@
 # Initial-M — Typecho 简约 SEO 博客主题 🚀  
 
 <div align="center">
-  <img src="screenshot.png" width="70%" height="auto" alt="主题封面">
+  <img src="screenshot.png" width="50%" height="auto" alt="主题封面">
 </div>
 
 ![Version](https://img.shields.io/badge/version-3.2.0-blue)
