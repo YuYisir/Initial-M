@@ -5,7 +5,7 @@
  * 
  * @package Initial-M
  * @author YuYisir
- * @version 3.2.0
+ * @version 3.2.1
  * @link https://www.886a.top/
  */
 if (!defined('__TYPECHO_ROOT_DIR__')) exit;
@@ -45,6 +45,6 @@ if ($this->_currentPage == 1 && !empty($this->options->ShowWhisper) && in_array(
 </article>
 <?php endwhile; ?>
 <?php $this->pageNav('上一页', $this->options->AjaxLoad ? '查看更多' : '下一页', 2, '..', $this->options->AjaxLoad ? array('wrapClass' => $this->options->AjaxLoad == 'auto' ? 'page-navigator ajaxload auto' : 'page-navigator ajaxload') : ''); ?>
-</div>
+</main>
 <?php if (!$this->options->OneCOL): $this->need('sidebar.php'); endif; ?>
 <?php $this->need('footer.php'); ?>

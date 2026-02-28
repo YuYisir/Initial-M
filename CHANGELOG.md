@@ -1,5 +1,23 @@
 # Initial-M主题更新日志
 
+## v3.2.1 (2026-02-28)
+
+#### 1. HTML5语义化标签完善
+- **header.php/sidebar.php/footer.php**: 使用HTML5语义化标签（`<main>`/`<nav>`/`<aside>`）替代`<div>`，修复`sidebar-fixed`类名写法，提升语义化和无障碍访问支持
+- **优化效果**: 提升HTML语义化标准，增强无障碍访问支持，满足PageSpeed Insights检测要求
+
+#### 2. Open Graph标签完善
+- **header.php**: 添加Open Graph标签（`og:title`/`og:description`/`og:image`/`og:site_name`）及文章专用标签（`article:author`/`article:published_time`/`article:modified_time`），修复ahrefs SEO检测问题，提升社交分享效果
+
+#### 3. Canonical URL标签完善
+- **header.php**: 为非文章/页面添加canonical URL标签，使用`Typecho\Common::url()`方法处理URL，修复ahrefs SEO检测问题，防止重复内容，集中页面权重
+
+#### 4. 无障碍访问优化
+- **header.php**: 为`<html>`标签添加`lang="zh-CN"`语言属性，为导航切换按钮添加`aria-label`无障碍标签，提升无障碍访问体验
+
+#### 6. 分页按钮样式优化
+- **style.min.css**: 优化分页按钮部分样式
+
 ## v3.2.0 (2026-02-26)
 
 #### 1. 白屏问题修复

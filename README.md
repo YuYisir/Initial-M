@@ -4,7 +4,7 @@
   <img src="screenshot.png" width="50%" height="auto" alt="主题封面">
 </div>
 
-![Version](https://img.shields.io/badge/version-3.2.0-blue)
+![Version](https://img.shields.io/badge/version-3.2.1-blue)
 ![Typecho](https://img.shields.io/badge/Typecho-1.1--1.3-green)
 ![License](https://img.shields.io/badge/license-MIT-brightgreen)
 
@@ -39,10 +39,10 @@
 
 ## 🧩 技术亮点
 
-- 修复 Typecho 1.3.0 `Widget\Base\Contents::push()` 报错
-- 完整面包屑结构化数据 item 支持
-- 容错机制优化，修复潜在白屏问题
-- 广告初始化逻辑优化，避免重复 push
+- **Typecho 1.3.0 兼容**：修复 `Widget\Base\Contents::push()` 报错
+- **SEO 深度优化**：完整 Schema.org 结构化数据、Open Graph
+- **稳定性提升**：容错机制优化，修复潜在白屏问题；广告初始化逻辑优化
+- **无障碍访问**：HTML5 语义化标签、ARIA 属性支持，满足 PageSpeed Insights 检测要求
 
 ---
 
@@ -64,14 +64,13 @@
 
 ## 📈 当前版本更新日志
 
-**当前版本：v3.2.0 (2026-02-26)**
+**当前版本：v3.2.1 (2026-02-28)**
 
-- 修复白屏问题
-- 修复结构化数据问题
-- 修复面包屑缺少 item 字段
-- 修复后台设置选项无法选中问题
+- **SEO 与无障碍优化**：HTML5 语义化标签（nav/aside/main）、Open Graph 标签、Canonical URL、lang 属性、aria-label 支持
+- **样式优化**：分页按钮样式改进
+- **社交分享**：完善社交分享元数据，提升搜索引擎排名
 
-📄 查看完整历史更新请前往 [CHANGELOG.md](CHANGELOG.md)
+📄 查看完整详细历史更新请前往 [CHANGELOG.md](CHANGELOG.md)
 
 ---
 

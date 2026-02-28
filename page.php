@@ -8,6 +8,6 @@ Breadcrumbs($this); ?>
 </div>
 </article>
 <?php $this->need('comments.php'); ?>
-</div>
+</main>
 <?php if (!$this->options->OneCOL): $this->need('sidebar.php'); endif; ?>
 <?php $this->need('footer.php'); ?>
