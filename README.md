@@ -69,6 +69,7 @@
 - **SEO 与无障碍优化**：HTML5 语义化标签（nav/aside/main）、Open Graph 标签、Canonical URL、lang 属性、aria-label 支持
 - **样式优化**：分页按钮样式改进
 - **社交分享**：完善社交分享元数据，提升搜索引擎排名
+- **功能增强**：侧边栏自定义代码功能，支持在不同位置显示HTML/CSS/JavaScript代码
 
 📄 查看完整详细历史更新请前往 [CHANGELOG.md](CHANGELOG.md)
 
