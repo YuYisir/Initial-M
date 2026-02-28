@@ -1,7 +1,7 @@
 <?php
 if (!defined('__TYPECHO_ROOT_DIR__')) exit;
 error_reporting(0);
-define('INITIAL_VERSION_NUMBER', '3.2.1');
+define('INITIAL_VERSION_NUMBER', '3.2.2');
 if (Helper::options()->GravatarUrl) define('__TYPECHO_GRAVATAR_PREFIX__', Helper::options()->GravatarUrl);
 
 function themeConfig($form) {
@@ -186,6 +186,34 @@ function themeConfig($form) {
 	'ShowOther' => _t('显示其它杂项')),
 	array('ShowRecentPosts', 'ShowRecentComments', 'ShowCategory', 'ShowTag', 'ShowArchive', 'ShowOther'), _t('侧边栏显示'));
 	$form->addInput($sidebarBlock->multiMode());
+
+	$SidebarCustomCode = new Typecho_Widget_Helper_Form_Element_Radio('SidebarCustomCode', 
+	array(1 => _t('启用'),
+	0 => _t('关闭')),
+	0, _t('侧边栏自定义代码'), _t('在侧边栏添加自定义代码区域'));
+	$form->addInput($SidebarCustomCode);
+
+	$SidebarCustomCodePosition = new Typecho_Widget_Helper_Form_Element_Select('SidebarCustomCodePosition', 
+	array('top' => _t('顶部'),
+	'after_whisper' => _t('轻语之后'),
+	'after_hot' => _t('热门文章之后'),
+	'after_recent' => _t('最新文章之后'),
+	'after_random' => _t('随机文章之后'),
+	'after_comments' => _t('最近回复之后'),
+	'after_category' => _t('分类之后'),
+	'after_ad' => _t('广告之后'),
+	'after_tag' => _t('标签之后'),
+	'after_archive' => _t('归档之后'),
+	'after_links' => _t('链接之后'),
+	'after_stats' => _t('站点统计之后'),
+	'after_other' => _t('其它之后'),
+	'bottom' => _t('底部')),
+	'bottom', _t('显示位置'), _t('选择自定义代码在侧边栏的显示位置'));
+	$form->addInput($SidebarCustomCodePosition);
+
+	$SidebarCustomCodeContent = new Typecho_Widget_Helper_Form_Element_Textarea('SidebarCustomCodeContent', NULL, NULL, _t('自定义代码内容'), _t('在这里输入自定义代码，支持HTML、CSS和JavaScript'));
+	$SidebarCustomCodeContent->input->setAttribute('class', 'w-100');
+	$form->addInput($SidebarCustomCodeContent);
 
 	$SiteStatsDateType = new Typecho_Widget_Helper_Form_Element_Radio('SiteStatsDateType',
 	array('first' => _t('使用第一篇文章日期'),
