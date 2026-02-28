@@ -107,6 +107,6 @@ echo $content;
 <li>上一篇: <?php $this->thePrev('%s','没有了'); ?></li>
 <li>下一篇: <?php $this->theNext('%s','没有了'); ?></li>
 </ul>
-</div>
+</main>
 <?php if (!$this->options->OneCOL): $this->need('sidebar.php'); endif; ?>
 <?php $this->need('footer.php'); ?>

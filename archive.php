@@ -43,6 +43,6 @@ $this->need('header.php'); ?>
 </article>
 <?php endif; ?>
 <?php $this->pageNav('上一页', $this->options->AjaxLoad ? '查看更多' : '下一页', 2, '..', $this->options->AjaxLoad ? array('wrapClass' => 'page-navigator ajaxload') : ''); ?>
-</div>
+</main>
 <?php if (!$this->options->OneCOL): $this->need('sidebar.php'); endif; ?>
 <?php $this->need('footer.php'); ?>

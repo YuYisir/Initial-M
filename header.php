@@ -1,6 +1,6 @@
 <?php if (!defined('__TYPECHO_ROOT_DIR__')) exit; ?>
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
 <meta charset="<?php $this->options->charset(); ?>" />
 <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -50,8 +50,22 @@ if ($this->is('post') || $this->is('page')) {
 }
 ?>
 
-<meta name="description" content="<?php echo $desc; ?>" />
+
+<!-- Canonical URL -->
+<?php if (!$this->is('post') && !$this->is('page')): ?>
+<link rel="canonical" href="<?php echo Typecho\Common::url($this->request->getRequestUri(), $this->options->siteUrl); ?>" />
+<?php endif; ?>
+<!-- Open Graph Tags -->
+<meta property="og:title" content="<?php $this->archiveTitle('', '', ''); ?><?php $this->options->title(); ?>" />
+<meta property="og:description" content="<?php echo $desc; ?>" />
+
 <meta property="og:image" content="<?php echo $cover; ?>" />
+<meta property="og:site_name" content="<?php $this->options->title(); ?>" />
+<?php if ($this->is('post') || $this->is('page')): ?>
+<meta property="article:author" content="<?php $this->author(); ?>" />
+<meta property="article:published_time" content="<?php $this->date('c'); ?>" />
+<meta property="article:modified_time" content="<?php echo date('c', $this->modified); ?>" />
+<?php endif; ?>
 
 <?php if ($this->is('index') || $this->is('post') || $this->is('page')): ?>
 <script type="application/ld+json">
@@ -103,8 +117,8 @@ if ($this->is('post') || $this->is('page')) {
 </<?php echo $this->is('post') || $this->is('page') ? 'p' : 'h1' ?>>
 </div>
 <script>function Navswith(){document.getElementById("header").classList.toggle("on")}</script>
-<button id="nav-swith" onclick="Navswith()"><span></span></button>
-<div id="nav">
+<button id="nav-swith" onclick="Navswith()" aria-label="切换导航菜单"><span></span></button>
+<nav id="nav">
 <div id="site-search">
 <form id="search" method="post" action="<?php $this->options->siteUrl(); ?>">
 <input type="text" id="s" name="s" class="text" placeholder="输入关键字搜索" required />
@@ -164,7 +178,7 @@ if (in_array('AggPage', $this->options->Navset)): ?>
 <?php endif;
 endif; ?>
 </ul>
-</div>
+</nav>
 </div>
 </header>
 <?php if ($this->options->Announcement && $this->options->AnnouncementContent): ?>
@@ -176,4 +190,4 @@ endif; ?>
 <?php endif; ?>
 <div id="body"<?php if ($this->options->PjaxOption): ?> in-pjax<?php endif; ?>>
 <div class="container clearfix">
-<div id="main">
+<main id="main">
