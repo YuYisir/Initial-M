@@ -1,8 +1,18 @@
 <?php if (!defined('__TYPECHO_ROOT_DIR__')) exit; ?>
 <aside id="secondary"<?php if ($this->options->SidebarFixed): ?> class="sidebar-fixed"<?php endif; ?>>
+<?php if (!empty($this->options->SidebarCustomCode) && $this->options->SidebarCustomCode == 1 && $this->options->SidebarCustomCodePosition == 'top'): ?>
+<section class="widget">
+<?php $this->options->SidebarCustomCodeContent(); ?>
+</section>
+<?php endif; ?>
 <?php if (!empty($this->options->ShowWhisper) && in_array('sidebar', $this->options->ShowWhisper)): ?>
 <section class="widget">
 <?php Whisper(1); ?>
+</section>
+<?php endif; ?>
+<?php if (!empty($this->options->SidebarCustomCode) && $this->options->SidebarCustomCode == 1 && $this->options->SidebarCustomCodePosition == 'after_whisper'): ?>
+<section class="widget">
+<?php $this->options->SidebarCustomCodeContent(); ?>
 </section>
 <?php endif; ?>
 <?php if (!empty($this->options->sidebarBlock) && in_array('ShowHotPosts', $this->options->sidebarBlock)): ?>
@@ -13,6 +23,11 @@
 </ul>
 </section>
 <?php endif; ?>
+<?php if (!empty($this->options->SidebarCustomCode) && $this->options->SidebarCustomCode == 1 && $this->options->SidebarCustomCodePosition == 'after_hot'): ?>
+<section class="widget">
+<?php $this->options->SidebarCustomCodeContent(); ?>
+</section>
+<?php endif; ?>
 <?php if (!empty($this->options->sidebarBlock) && in_array('ShowRecentPosts', $this->options->sidebarBlock)): ?>
 <section class="widget">
 <h3 class="widget-title">最新文章</h3>
@@ -21,12 +36,22 @@
 </ul>
 </section>
 <?php endif; ?>
+<?php if (!empty($this->options->SidebarCustomCode) && $this->options->SidebarCustomCode == 1 && $this->options->SidebarCustomCodePosition == 'after_recent'): ?>
+<section class="widget">
+<?php $this->options->SidebarCustomCodeContent(); ?>
+</section>
+<?php endif; ?>
 <?php if (!empty($this->options->sidebarBlock) && in_array('ShowRandomPosts', $this->options->sidebarBlock)): ?>
 <section class="widget">
 <h3 class="widget-title">随机文章</h3>
 <ul class="widget-list rec-post-list">
 <?php Contents_Post_Random($this->options->postsListSize); ?>
 </ul>
+</section>
+<?php endif; ?>
+<?php if (!empty($this->options->SidebarCustomCode) && $this->options->SidebarCustomCode == 1 && $this->options->SidebarCustomCodePosition == 'after_random'): ?>
+<section class="widget">
+<?php $this->options->SidebarCustomCodeContent(); ?>
 </section>
 <?php endif; ?>
 <?php if (!empty($this->options->sidebarBlock) && in_array('ShowRecentComments', $this->options->sidebarBlock)): ?>
@@ -57,6 +82,11 @@ $title_text = (!$is_published && !$is_whisper_template && $this->authorId !== $t
 </ul>
 </section>
 <?php endif; ?>
+<?php if (!empty($this->options->SidebarCustomCode) && $this->options->SidebarCustomCode == 1 && $this->options->SidebarCustomCodePosition == 'after_comments'): ?>
+<section class="widget">
+<?php $this->options->SidebarCustomCodeContent(); ?>
+</section>
+<?php endif; ?>
 <?php if (!empty($this->options->sidebarBlock) && in_array('ShowCategory', $this->options->sidebarBlock)): ?>
 <section class="widget">
 <h3 class="widget-title">分类</h3>
@@ -64,6 +94,11 @@ $title_text = (!$is_published && !$is_whisper_template && $this->authorId !== $t
 <?php $this->widget('Widget_Metas_Category_List')
 ->parse('<li><a href="{permalink}">{name}</a></li>'); ?>
 </ul>
+</section>
+<?php endif; ?>
+<?php if (!empty($this->options->SidebarCustomCode) && $this->options->SidebarCustomCode == 1 && $this->options->SidebarCustomCodePosition == 'after_category'): ?>
+<section class="widget">
+<?php $this->options->SidebarCustomCodeContent(); ?>
 </section>
 <?php endif; ?>
 <!-- 侧边栏广告开始 -->
@@ -74,6 +109,11 @@ $title_text = (!$is_published && !$is_whisper_template && $this->authorId !== $t
 <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
 <?php endif; ?>
 <!-- 侧边栏广告结束 -->
+<?php if (!empty($this->options->SidebarCustomCode) && $this->options->SidebarCustomCode == 1 && $this->options->SidebarCustomCodePosition == 'after_ad'): ?>
+<section class="widget">
+<?php $this->options->SidebarCustomCodeContent(); ?>
+</section>
+<?php endif; ?>
 <?php if (!empty($this->options->sidebarBlock) && in_array('ShowTag', $this->options->sidebarBlock)): ?>
 <section class="widget">
 <h3 class="widget-title">标签</h3>
@@ -89,6 +129,11 @@ $title_text = (!$is_published && !$is_whisper_template && $this->authorId !== $t
 </ul>
 </section>
 <?php endif; ?>
+<?php if (!empty($this->options->SidebarCustomCode) && $this->options->SidebarCustomCode == 1 && $this->options->SidebarCustomCodePosition == 'after_tag'): ?>
+<section class="widget">
+<?php $this->options->SidebarCustomCodeContent(); ?>
+</section>
+<?php endif; ?>
 <?php if (!empty($this->options->sidebarBlock) && in_array('ShowArchive', $this->options->sidebarBlock)): ?>
 <section class="widget">
 <h3 class="widget-title">归档</h3>
@@ -96,6 +141,11 @@ $title_text = (!$is_published && !$is_whisper_template && $this->authorId !== $t
 <?php $this->widget('Widget_Contents_Post_Date', 'type=month&format=Y 年 n 月')
 ->parse('<li><a href="{permalink}">{date}</a></li>'); ?>
 </ul>
+</section>
+<?php endif; ?>
+<?php if (!empty($this->options->SidebarCustomCode) && $this->options->SidebarCustomCode == 1 && $this->options->SidebarCustomCodePosition == 'after_archive'): ?>
+<section class="widget">
+<?php $this->options->SidebarCustomCodeContent(); ?>
 </section>
 <?php endif; ?>
 <?php if (!empty($this->options->ShowLinks) && in_array('sidebar', $this->options->ShowLinks)): ?>
@@ -113,6 +163,11 @@ if ($page_links):
 </ul>
 </section>
 <?php endif; ?>
+<?php if (!empty($this->options->SidebarCustomCode) && $this->options->SidebarCustomCode == 1 && $this->options->SidebarCustomCodePosition == 'after_links'): ?>
+<section class="widget">
+<?php $this->options->SidebarCustomCodeContent(); ?>
+</section>
+<?php endif; ?>
 <?php if (!empty($this->options->sidebarBlock) && in_array('ShowSiteStats', $this->options->sidebarBlock)): ?>
 <section class="widget">
 <h3 class="widget-title">站点统计</h3>
@@ -123,6 +178,11 @@ if ($page_links):
 <li>已运行：<?php echo $stats['runtime']; ?></li>
 <li>总计码字：<?php echo $stats['words']; ?></li>
 </ul>
+</section>
+<?php endif; ?>
+<?php if (!empty($this->options->SidebarCustomCode) && $this->options->SidebarCustomCode == 1 && $this->options->SidebarCustomCodePosition == 'after_stats'): ?>
+<section class="widget">
+<?php $this->options->SidebarCustomCodeContent(); ?>
 </section>
 <?php endif; ?>
 <?php if (!empty($this->options->sidebarBlock) && in_array('ShowOther', $this->options->sidebarBlock)): ?>
@@ -138,4 +198,14 @@ if ($page_links):
 </ul>
 </section>
 <?php endif; ?>
-</div>
+<?php if (!empty($this->options->SidebarCustomCode) && $this->options->SidebarCustomCode == 1 && $this->options->SidebarCustomCodePosition == 'after_other'): ?>
+<section class="widget">
+<?php $this->options->SidebarCustomCodeContent(); ?>
+</section>
+<?php endif; ?>
+<?php if (!empty($this->options->SidebarCustomCode) && $this->options->SidebarCustomCode == 1 && $this->options->SidebarCustomCodePosition == 'bottom'): ?>
+<section class="widget">
+<?php $this->options->SidebarCustomCodeContent(); ?>
+</section>
+<?php endif; ?>
+</aside>
