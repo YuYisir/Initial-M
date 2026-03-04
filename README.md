@@ -22,7 +22,7 @@
 
 ## ✨ 核心特性
 
-- 🧠 完整 Schema.org 结构化数据支持（已通过 [Google Rich Results 测试](https://search.google.com/test/rich-results)） | [AHREFS 工具](https://ahrefs.com/zh/seo-toolbar)
+- 🧠 完整 Schema.org 结构化数据支持（已通过 [Google Rich Results 测试](https://search.google.com/test/rich-results) | [AHREFS 工具](https://ahrefs.com/zh/seo-toolbar)）
 - ⚡ SEO 优化（Meta / Title / Breadcrumb / Open Graph）
 - 📱 响应式排版设计
 - 🔐 评论数学验证码防垃圾评论
