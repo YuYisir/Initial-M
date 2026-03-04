@@ -4,8 +4,9 @@
   <img src="screenshot.png" width="50%" height="auto" alt="主题封面">
 </div>
 
-![Version](https://img.shields.io/badge/version-3.2.1-blue)
-![Typecho](https://img.shields.io/badge/Typecho-1.1--1.3-green)
+![Version](https://img.shields.io/badge/version-3.2.3-blue)
+![Typecho](https://img.shields.io/badge/Typecho-1.3-green)
+![PHP](https://img.shields.io/badge/PHP-8.1+-red)
 ![License](https://img.shields.io/badge/license-MIT-brightgreen)
 
 > 简约而不简单 · 高度优化 · 持续维护中  
@@ -28,11 +29,11 @@
 - 👁 回复可见功能 `[hidden][/hidden]` 标签
 - 📊 侧边栏统计模块（文章数 / 评论数 / 运行时间）
 - 🎲 随机文章模块
+- 🎨 图片懒加载功能
 - 📢 公告栏功能（支持 HTML）
 - 💾 主题设置备份 / 还原功能
 - 📦 Google 广告位延迟加载优化
 - 🌐 多头像源支持（Cravatar / Weavatar / SEP 等）
-- ✅ Typecho 1.1 ~ 1.3.0 全兼容
 - 更多细节等你发掘
 
 ---
@@ -41,6 +42,7 @@
 
 - **Typecho 1.3.0 兼容**：修复 `Widget\Base\Contents::push()` 报错
 - **SEO 深度优化**：完整 Schema.org 结构化数据、Open Graph
+- **性能优化**：集成 lazysizes 库实现图片懒加载，提升页面加载速度
 - **稳定性提升**：容错机制优化，修复潜在白屏问题；广告初始化逻辑优化
 - **无障碍访问**：HTML5 语义化标签、ARIA 属性支持，满足 PageSpeed Insights 检测要求
 
@@ -55,6 +57,22 @@
 
 ---
 
+## ⚙️ 运行环境
+
+- 最低要求
+  - Typecho ≥ 1.1
+  - PHP ≥ 7.4
+
+- 推荐环境
+  - Typecho 1.3.0
+  - PHP 8.1+
+
+- 已测试环境
+  - Typecho 1.3.0 1.2.1
+  - PHP 8.3
+
+> 本主题已针对 PHP 8.x 进行兼容优化，建议使用较新的 PHP 版本以获得更好的性能与安全性。
+
 ## 🍕 分支说明
 
 - **master 分支**：稳定版本，推荐生产环境使用
@@ -64,12 +82,10 @@
 
 ## 📈 当前版本更新日志
 
-**当前版本：v3.2.2 (2026-02-28)**
+**当前版本：v3.2.3 (2026-03-04)**
 
-- **SEO 与无障碍优化**：HTML5 语义化标签（nav/aside/main）、Open Graph 标签、Canonical URL、lang 属性、aria-label 支持
-- **样式优化**：分页按钮样式改进
-- **社交分享**：完善社交分享元数据，提升搜索引擎排名
-- **功能增强**：侧边栏自定义代码功能，支持在不同位置显示HTML/CSS/JavaScript代码
+- **性能优化**：集成lazysizes库实现图片懒加载，提升页面加载速度
+- **功能修复**：修复代码块中的[hidden]标签被误处理的问题，保护代码块内容
 
 📄 查看完整详细历史更新请前往 [CHANGELOG.md](CHANGELOG.md)
 

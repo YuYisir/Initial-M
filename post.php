@@ -69,11 +69,17 @@ $sql = $db->select()->from('table.comments')
 //只有通过审核的评论才能看回复可见内容
     ->limit(1);
 $result = $db->fetchAll($sql);
+
+$content = preg_replace_callback('/(```[\s\S]*?```|`[^`]+`|<code[\s\S]*?<\/code>|<pre[\s\S]*?<\/pre>)/', function($matches) {
+    return str_replace(array('[hidden]', '[/hidden]'), array('&#91;hidden&#93;', '&#91;/hidden&#93;'), $matches[0]);
+}, $this->content);
+
 if($this->user->hasLogin() || $result) {
-    $content = preg_replace("/\[hidden\](.*?)\[\/hidden\]/sm",'<div class="reply2view">$1</div>',$this->content);
+    $content = preg_replace("/\[hidden\](.*?)\[\/hidden\]/sm",'<div class="reply2view">$1</div>',$content);
 } else{
-    $content = preg_replace("/\[hidden\](.*?)\[\/hidden\]/sm",'<div class="reply2view">此处内容需要评论回复后方可阅读</div>',$this->content);
+    $content = preg_replace("/\[hidden\](.*?)\[\/hidden\]/sm",'<div class="reply2view">此处内容需要评论回复后方可阅读</div>',$content);
 }
+
 echo $content;
 ?>
 <!-- 回复可见结束（审核通过） -->
@@ -98,7 +104,7 @@ echo $content;
     <p>最后更新于 <?php echo date('Y-m-d', $this->modified); ?> 「部分内容存在时效性，如有失效请留言反馈」</p>
     <p>除注明外为 <?php $this->options->title(); ?> 原创文章，转载请注明出处。</p>
     <p><?php echo $this->options->LicenseInfo ? $this->options->LicenseInfo : '本作品采用 <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="license nofollow">知识共享署名-相同方式共享 4.0 国际许可协议</a> 进行许可。' ?></p>
-    <p>本文链接：<a href="<?php $this->permalink(); ?>" target="_blank"><?php $this->permalink(); ?></a></p>
+    <p>本文链接：<a href="<?php $this->permalink(); ?>" rel="noopener"><?php $this->permalink(); ?></a></p>
 </div>
 <?php endif; ?>
 </article>

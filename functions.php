@@ -1,7 +1,7 @@
 <?php
 if (!defined('__TYPECHO_ROOT_DIR__')) exit;
 error_reporting(0);
-define('INITIAL_VERSION_NUMBER', '3.2.2');
+define('INITIAL_VERSION_NUMBER', '3.2.3');
 if (Helper::options()->GravatarUrl) define('__TYPECHO_GRAVATAR_PREFIX__', Helper::options()->GravatarUrl);
 
 function themeConfig($form) {
@@ -128,6 +128,12 @@ function themeConfig($form) {
 	0 => _t('关闭')),
 	0, _t('代码高亮'), _t('默认关闭，启用则会渲染页面内代码块”'));
 	$form->addInput($Highlight);
+
+	$LazyLoad = new Typecho_Widget_Helper_Form_Element_Radio('LazyLoad', 
+	array(1 => _t('启用'),
+	0 => _t('关闭')),
+	0, _t('图片懒加载'), _t('默认关闭，启用则会延迟加载图片，提升页面加载速度'));
+	$form->addInput($LazyLoad);
 
 	$catalog = new Typecho_Widget_Helper_Form_Element_Radio('catalog', 
 	array('post' => _t('使用文章内设定'),
@@ -346,6 +352,9 @@ function themeInit($archive) {
 	}
 	if ($archive->is('single')) {
 		$archive->content = hrefOpen($archive->content);
+		if ($options->LazyLoad) {
+			$archive->content = lazyLoadImages($archive->content);
+		}
 		if ($options->AttUrlReplace) {
 			$archive->content = UrlReplace($archive->content);
 		}
@@ -367,6 +376,11 @@ function cjUrl($path) {
 
 function hrefOpen($obj) {
 	return preg_replace('/<a\b([^>]+?)\bhref="((?!'.addcslashes(Helper::options()->index, '/._-+=#?&').'|\#).*?)"([^>]*?)>/i', '<a\1href="\2"\3 target="_blank">', $obj);
+}
+
+function lazyLoadImages($obj) {
+	// 将普通img标签转换为支持lazysizes的格式
+	return preg_replace('/<img\s+src="([^"]+)"\s*([^>]*)>/i', '<img data-src="$1" class="lazyload" $2>', $obj);
 }
 
 function UrlReplace($obj) {
@@ -394,7 +408,11 @@ function postThumb($obj) {
 	if (Helper::options()->AttUrlReplace) {
 		$thumb = UrlReplace($thumb);
 	}
-	return '<img src="'.$thumb.'" />';
+	if (Helper::options()->LazyLoad) {
+		return '<img data-src="'.$thumb.'" class="lazyload" />';
+	} else {
+		return '<img src="'.$thumb.'" />';
+	}
 }
 
 function Postviews($archive) {
@@ -811,6 +829,9 @@ class myyodux {
     {
       $text = empty($text)?$con:$text;
       if(!$obj->is('single')){
+      $text = preg_replace_callback('/(```[\s\S]*?```|`[^`]+`|<code[\s\S]*?<\/code>|<pre[\s\S]*?<\/pre>)/', function($matches) {
+          return str_replace(array('[hidden]', '[/hidden]'), array('&#91;hidden&#93;', '&#91;/hidden&#93;'), $matches[0]);
+      }, $text);
       $text = preg_replace("/\[hidden\](.*?)\[\/hidden\]/sm",'',$text);
       }
       
