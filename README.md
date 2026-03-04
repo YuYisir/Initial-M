@@ -106,6 +106,10 @@ Initial-M 基于 Initial v2.5.5 版本进行增强开发，
 
 ---
 
+## 使用 Initial-M 的网站
+
+如果你正在使用本主题，欢迎前往 [Issues](https://github.com/YuYisir/Initial-M/issues) 提交你的网站信息。
+
 ## 📄 License
 
 MIT License
