@@ -4,7 +4,7 @@
   <img src="screenshot.png" width="50%" height="auto" alt="主题封面">
 </div>
 
-![Version](https://img.shields.io/badge/version-3.2.3-blue)
+![Version](https://img.shields.io/badge/version-3.2.4-blue)
 ![Typecho](https://img.shields.io/badge/Typecho-1.3-green)
 ![PHP](https://img.shields.io/badge/PHP-8.1+-red)
 ![License](https://img.shields.io/badge/license-MIT-brightgreen)
@@ -82,10 +82,10 @@
 
 ## 📈 当前版本更新日志
 
-**当前版本：v3.2.3 (2026-03-04)**
+**当前版本：v3.2.4 (2026-03-06)**
 
-- **性能优化**：集成lazysizes库实现图片懒加载，提升页面加载速度
-- **功能修复**：修复代码块中的[hidden]标签被误处理的问题，保护代码块内容
+- **性能优化**：优化图片懒加载策略，首屏图片立即加载，后续图片延迟加载，只在需要时加载 lazysizes 库
+- **代码优化**：优化懒加载库加载逻辑，确保 DOM 完全加载后再检测，提升稳定性
 
 📄 查看完整详细历史更新请前往 [CHANGELOG.md](CHANGELOG.md)
 

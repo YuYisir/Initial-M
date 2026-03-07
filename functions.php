@@ -1,7 +1,7 @@
 <?php
 if (!defined('__TYPECHO_ROOT_DIR__')) exit;
 error_reporting(0);
-define('INITIAL_VERSION_NUMBER', '3.2.3');
+define('INITIAL_VERSION_NUMBER', '3.2.4');
 if (Helper::options()->GravatarUrl) define('__TYPECHO_GRAVATAR_PREFIX__', Helper::options()->GravatarUrl);
 
 function themeConfig($form) {
@@ -377,10 +377,18 @@ function cjUrl($path) {
 function hrefOpen($obj) {
 	return preg_replace('/<a\b([^>]+?)\bhref="((?!'.addcslashes(Helper::options()->index, '/._-+=#?&').'|\#).*?)"([^>]*?)>/i', '<a\1href="\2"\3 target="_blank">', $obj);
 }
-
-function lazyLoadImages($obj) {
-	// 将普通img标签转换为支持lazysizes的格式
-	return preg_replace('/<img\s+src="([^"]+)"\s*([^>]*)>/i', '<img data-src="$1" class="lazyload" $2>', $obj);
+// 将普通img标签转换为支持lazysizes的格式
+function lazyLoadImages($content) {
+    if (!Helper::options()->LazyLoad) return $content;
+    $count = 0;
+    return preg_replace_callback('/<img([^>]+?)src=["\']([^"\']+)["\']([^>]*)>/i', function($matches) use (&$count) {
+        $count++;
+        $img = $matches[0];
+        // 首图片不懒加载
+        if ($count == 1) return $img;
+        // 后续图片懒加载
+        return str_replace('<img', '<img class="lazyload" data-src="'.$matches[2].'" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" loading="lazy"', $img);
+    }, $content);
 }
 
 function UrlReplace($obj) {
@@ -408,11 +416,9 @@ function postThumb($obj) {
 	if (Helper::options()->AttUrlReplace) {
 		$thumb = UrlReplace($thumb);
 	}
-	if (Helper::options()->LazyLoad) {
-		return '<img data-src="'.$thumb.'" class="lazyload" />';
-	} else {
-		return '<img src="'.$thumb.'" />';
-	}
+    return Helper::options()->LazyLoad 
+        ? '<img class="lazyload" data-src="'.$thumb.'" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" loading="lazy" />'
+        : '<img src="'.$thumb.'" />';
 }
 
 function Postviews($archive) {
