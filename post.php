@@ -79,7 +79,17 @@ if($this->user->hasLogin() || $result) {
 } else{
     $content = preg_replace("/\[hidden\](.*?)\[\/hidden\]/sm",'<div class="reply2view">此处内容需要评论回复后方可阅读</div>',$content);
 }
+// 文章过期提醒
+if ($this->options->ExpireNotice) {
+    $expireDays = intval($this->options->ExpireNoticeDays) ?: 180;
+    $modifiedTime = $this->modified;
+    $currentTime = time();
+    $daysSinceModified = ($currentTime - $modifiedTime) / 86400;
 
+    if ($daysSinceModified > $expireDays) {
+        echo '<div class="expire-notice" style="background:#f8f9fa;border-left:2px solid #6c757d;padding:6px 10px;margin-bottom:12px;border-radius:4px;"><p style="margin:0;">⚠️ 本文已超过 ' . $expireDays . ' 天未更新，部分内容可能具有时效性，请注意核实最新情况。</p></div>';
+    }
+}
 echo $content;
 ?>
 <!-- 回复可见结束（审核通过） -->
@@ -98,6 +108,13 @@ echo $content;
 <a><img src="<?php $this->options->Alipay(); ?>" alt="支付宝收款二维码" />支付宝</a><?php endif; ?>
 </p>
 <?php endif; ?>
+<!-- 文章互动功能开始 -->
+<?php if ($this->options->PostRating || $this->options->PostQrcode): ?>
+<div class="post-interaction" style="margin:20px 0;padding:12px;background:#fff;border:1px solid #eee;border-radius:2px;">
+    <?php $this->need('post-interaction.php'); ?>
+</div>
+<?php endif; ?>
+<!-- 文章互动功能结束 -->
 <p class="tags">标签: <?php $this->tags(', ', true, 'none'); ?></p>
 <?php if ($this->options->LicenseInfo !== '0'): ?>
 <div class="license-box">
