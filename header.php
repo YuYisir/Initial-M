@@ -19,8 +19,7 @@
 <!-- Robots Meta Tag -->
 <meta name="robots" content="index, follow" />
 <?php
-/** * 1. 统一描述 (Description) 获取与清洗逻辑 
- */
+/** 1. 统一描述 (Description) 获取与清洗逻辑 */
 $desc = '';
 if ($this->is('post') || $this->is('page')) {
     // 优先从自定义字段 description 读取，否则取摘要
@@ -31,9 +30,7 @@ if ($this->is('post') || $this->is('page')) {
 // 清洗数据：去掉 HTML 标签、换行符、多余空格，并转义双引号防止 JSON 报错
 $desc = str_replace(["\r", "\n", "\t", '"'], ' ', strip_tags($desc));
 $desc = mb_substr(trim($desc), 0, 150, 'utf-8'); // 限制 150 字以内
-
-/** * 2. 统一封面图 (Image) 获取逻辑 
- */
+/** * 2. 统一封面图 (Image) 获取逻辑 */
 $cover = '';
 if ($this->is('post') || $this->is('page')) {
     if (!empty($this->fields->thumb)) {
@@ -49,8 +46,6 @@ if ($this->is('post') || $this->is('page')) {
     $cover = $this->options->defaultCover ? $this->options->defaultCover : $this->options->themeUrl . '/img/default-cover.webp';
 }
 ?>
-
-
 <!-- Canonical URL -->
 <?php if (!$this->is('post') && !$this->is('page')): ?>
 <link rel="canonical" href="<?php echo Typecho\Common::url($this->request->getRequestUri(), $this->options->siteUrl); ?>" />

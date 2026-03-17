@@ -1,7 +1,7 @@
 <?php
 if (!defined('__TYPECHO_ROOT_DIR__')) exit;
 error_reporting(0);
-define('INITIAL_VERSION_NUMBER', '3.2.4');
+define('INITIAL_VERSION_NUMBER', '3.2.6');
 if (Helper::options()->GravatarUrl) define('__TYPECHO_GRAVATAR_PREFIX__', Helper::options()->GravatarUrl);
 
 function themeConfig($form) {
@@ -72,7 +72,16 @@ function themeConfig($form) {
 	$Alipay = new Typecho_Widget_Helper_Form_Element_Text('Alipay', NULL, NULL, _t('支付宝打赏二维码（建议图片尺寸不低于240*240）'), _t('在这里填入一个图片 URL 地址, 以添加一个支付宝打赏二维码，留空则不设置支付宝打赏'));
 	$form->addInput($Alipay);
 
-	$LicenseInfo = new Typecho_Widget_Helper_Form_Element_Text('LicenseInfo', NULL, NULL, _t('文章许可信息'), _t('填入后将在文章底部显示你填入的许可信息（支持HTML标签，输入数字“0”可关闭显示），留空则默认使用 (CC BY-SA 4.0)国际许可协议。'));
+	$ExpireNotice = new Typecho_Widget_Helper_Form_Element_Radio('ExpireNotice', 
+	array(1 => _t('启用'),
+	0 => _t('关闭')),
+	0, _t('文章过期提醒'), _t('默认关闭，启用后将在文章内容上方显示过期提醒'));
+	$form->addInput($ExpireNotice);
+
+	$ExpireNoticeDays = new Typecho_Widget_Helper_Form_Element_Text('ExpireNoticeDays', NULL, '180', _t('文章过期提醒天数'), _t('设置文章过期提醒的天数，默认为180天，仅在启用文章过期提醒时生效'));
+	$form->addInput($ExpireNoticeDays);
+
+	$LicenseInfo = new Typecho_Widget_Helper_Form_Element_Text('LicenseInfo', NULL, NULL, _t('文章许可信息'), _t('填入后将在文章底部显示你填入的许可信息（支持HTML标签，输入数字"0"可关闭显示），留空则默认使用 (CC BY-SA 4.0)国际许可协议。'));
 	$form->addInput($LicenseInfo);
 
 	$HeadFixed = new Typecho_Widget_Helper_Form_Element_Radio('HeadFixed', 
@@ -839,26 +848,21 @@ class myyodux {
           return str_replace(array('[hidden]', '[/hidden]'), array('&#91;hidden&#93;', '&#91;/hidden&#93;'), $matches[0]);
       }, $text);
       $text = preg_replace("/\[hidden\](.*?)\[\/hidden\]/sm",'',$text);
-      }
-      
-               return $text;
+      }return $text;
 }
 }/*回复可见样式结束*/
 /* 增加评论验证*/
 function spam_protection_math() {
-    $num1 = rand(1, 15);
-    $num2 = rand(1, 15);
+    $num1 = rand(1, 15);$num2 = rand(1, 15);
     echo "<div style=\"display:flex;flex-direction: column;align-items: flex-start;\"><p for=\"math\" id=\"Verification_code\" style=\"margin:0\"><code>$num1</code>+<code>$num2</code> 等于：</p><input type=\"text\" name=\"sum\" class=\"text\" value=\"\" size=\"25\" id=\"sum\" tabindex=\"4\" style=\"flex:1\" placeholder=\"计算结果 *\">\n</div>";
     echo "<input type=\"hidden\" name=\"num1\" value=\"$num1\">\n";
     echo "<input type=\"hidden\" name=\"num2\" value=\"$num2\">";
 }
 /* 增加评论验证结束*/
-
 // 注册评论验证码验证
 Typecho_Plugin::factory('Widget_Feedback')->comment = array('CommentProtection', 'verify');
 Typecho_Plugin::factory('Widget_Feedback')->trackback = array('CommentProtection', 'verify');
 Typecho_Plugin::factory('Widget_Feedback')->pingback = array('CommentProtection', 'verify');
-
 class CommentProtection {
     public static function verify($comment, $post, $result) {
         if ($_REQUEST['text'] != null) {
@@ -872,7 +876,6 @@ class CommentProtection {
                     throw new Typecho_Widget_Exception(_t('验证码错误.', '评论失败'));
                 }
             }
-        }
-        return $comment;
+        }return $comment;
     }
 }

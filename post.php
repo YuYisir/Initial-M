@@ -3,13 +3,8 @@
 if (!isset($cover)) {
     $cover = '';
     if ($this->is('post') || $this->is('page')) {
-        if (!empty($this->fields->thumb)) {
-            $cover = $this->fields->thumb;
-        } elseif ($this->options->autoFetchCover && preg_match('/<img.*?src="(.*?)"/', $this->content, $matches)) {
-            $cover = $matches[1];
-        } else {
-            $cover = $this->options->defaultCover ? $this->options->defaultCover : $this->options->themeUrl . '/img/default-cover.webp';
-        }
+        if (!empty($this->fields->thumb)) {$cover = $this->fields->thumb;
+        } elseif ($this->options->autoFetchCover && preg_match('/<img.*?src="(.*?)"/', $this->content, $matches)) {$cover = $matches[1];} else {$cover = $this->options->defaultCover ? $this->options->defaultCover : $this->options->themeUrl . '/img/default-cover.webp';}
     }
 }
 $this->need('header.php');
@@ -61,35 +56,26 @@ if (isset($this->categories) && count($this->categories) > 0) {
 <!-- 回复可见开始 此处注释的为原版内容：?php $this->content(); ?>-->
 <div class="post-content" itemprop="articleBody">
 <?php
-$content = $this->content; 
+$content = $this->content;
 if (strpos($content, '[hidden]') !== false) {
     $content = preg_replace_callback('/(```[\s\S]*?```|`[^`]+`|<code[\s\S]*?<\/code>|<pre[\s\S]*?<\/pre>)/', function($matches) {
-        return str_replace(array('[hidden]', '[/hidden]'), array('&#91;hidden&#93;', '&#91;/hidden&#93;'), $matches[0]);
-    }, $content);
-    if (strpos($content, '[hidden]') !== false) {
-        $hasPermission = false;
-        if ($this->user->hasLogin()) {
-            $hasPermission = true;
-        } else {
-            $mail = $this->remember('mail', true);
+        return str_replace(array('[hidden]', '[/hidden]'), array('&#91;hidden&#93;', '&#91;/hidden&#93;'), $matches[0]);}, $content);
+    if (strpos($content, '[hidden]') !== false) {$hasPermission = false;
+        if ($this->user->hasLogin()) {$hasPermission = true;} else {$mail = $this->remember('mail', true);
             if ($mail) {
                 $db = Typecho_Db::get();
-                $result = $db->fetchRow($db->select('coid')->from('table.comments')
-                    ->where('cid = ?', $this->cid)
-                    ->where('mail = ?', $mail)
-                    ->where('status = ?', 'approved')
-                    ->limit(1));
-                if ($result) {
-                    $hasPermission = true;
-                }
-            }
-        }
-        if ($hasPermission) {
-            $content = preg_replace("/\[hidden\](.*?)\[\/hidden\]/sm", '<div class="reply2view">$1</div>', $content);
-        } else {
-            $content = preg_replace("/\[hidden\](.*?)\[\/hidden\]/sm", '<div class="reply2view">此处内容需要评论回复后方可阅读</div>', $content);
-        }
-    }
+                $result = $db->fetchRow($db->select('coid')->from('table.comments')->where('cid = ?', $this->cid)->where('mail = ?', $mail)->where('status = ?', 'approved')->limit(1));
+                if ($result) {$hasPermission = true;}}}
+        if ($hasPermission) {$content = preg_replace("/\[hidden\](.*?)\[\/hidden\]/sm", '<div class="reply2view">$1</div>', $content);
+        } else {$content = preg_replace("/\[hidden\](.*?)\[\/hidden\]/sm", '<div class="reply2view">此处内容需要评论回复后方可阅读</div>', $content);}}
+}
+// 文章过期提醒
+if ($this->options->ExpireNotice) {
+    $expireDays = intval($this->options->ExpireNoticeDays) ?: 180;
+    $modifiedTime = $this->modified;
+    $currentTime = time();
+    $daysSinceModified = ($currentTime - $modifiedTime) / 86400;
+    if ($daysSinceModified > $expireDays) {echo '<div class="expire-notice" style="background:#f8f9fa;border-left:2px solid #6c757d;padding:6px 10px;margin-bottom:12px;border-radius:4px;"><p style="margin:0;">⚠️ 本文已超过 ' . $expireDays . ' 天未更新，部分内容可能具有时效性，请注意核实最新情况。</p></div>';}
 }
 echo $content;
 ?>
