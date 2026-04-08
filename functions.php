@@ -1,7 +1,7 @@
 <?php
 if (!defined('__TYPECHO_ROOT_DIR__')) exit;
 error_reporting(0);
-define('INITIAL_VERSION_NUMBER', '3.2.7');
+define('INITIAL_VERSION_NUMBER', '3.2.8');
 if (Helper::options()->GravatarUrl) define('__TYPECHO_GRAVATAR_PREFIX__', Helper::options()->GravatarUrl);
 
 function themeConfig($form) {
@@ -294,61 +294,125 @@ function themeConfig($form) {
 	$db = Typecho_Db::get();
 	$sjdq=$db->fetchRow($db->select()->from ('table.options')->where ('name = ?', 'theme:'.$name));
 	$ysj = $sjdq['value'];
+	
+	// 清理旧备份，只保留最近2个
+	function cleanOldBackups($db, $name, $keepCount = 2) {
+		$backups = $db->fetchAll(
+			$db->select()->from('table.options')
+			->where('name LIKE ?', 'theme:'.$name.'bf_%')
+			->order('name', Typecho_Db::SORT_DESC)
+		);
+		
+		if (count($backups) > $keepCount) {
+			$backupsToDelete = array_slice($backups, $keepCount);
+			foreach ($backupsToDelete as $backup) {
+				$db->query($db->delete('table.options')->where('name = ?', $backup['name']));
+			}
+		}
+	}
+	
 	if(isset($_POST['type']))
 	{ 
 	if($_POST["type"]=="备份模板设置数据"){
-	if($db->fetchRow($db->select()->from ('table.options')->where ('name = ?', 'theme:'.$name.'bf'))){
-	$update = $db->update('table.options')->rows(array('value'=>$ysj))->where('name = ?', 'theme:'.$name.'bf');
-	$updateRows= $db->query($update);
-	echo '<div class="tongzhi col-mb-12 home">备份已更新，请等待自动刷新！如果等不到请点击';
-	?>    
-	<a href="<?php Helper::options()->adminUrl('options-theme.php'); ?>">这里</a></div>
-	<script language="JavaScript">window.setTimeout("location='<?php Helper::options()->adminUrl('options-theme.php'); ?>'", 2500);</script>
-	<?php
-	}else{
-	if($ysj){
-		$insert = $db->insert('table.options')
-		->rows(array('name' => 'theme:'.$name.'bf','user' => '0','value' => $ysj));
-		$insertId = $db->query($insert);
-		echo '<div class="tongzhi col-mb-12 home">备份完成，请等待自动刷新！如果等不到请点击';
-		?>    
+		// 创建带时间戳的备份
+		$timestamp = time();
+		$backupKey = 'theme:'.$name.'bf_'.$timestamp;
+		
+		if($ysj){
+			$insert = $db->insert('table.options')
+			->rows(array('name' => $backupKey,'user' => '0','value' => $ysj));
+			$insertId = $db->query($insert);
+			
+			// 清理旧备份
+			cleanOldBackups($db, $name, 2);
+			
+			echo '<div class="tongzhi col-mb-12 home">备份完成，请等待自动刷新！如果等不到请点击';
+			?>	    
+			<a href="<?php Helper::options()->adminUrl('options-theme.php'); ?>">这里</a></div>
+			<script language="JavaScript">window.setTimeout("location='<?php Helper::options()->adminUrl('options-theme.php'); ?>'", 2500);</script>
+			<?php
+		}
+				}
+	if($_POST["type"]=="还原模板设置数据"){
+		// 获取最新的备份
+		$latestBackup = $db->fetchRow(
+			$db->select()->from('table.options')
+			->where('name LIKE ?', 'theme:'.$name.'bf_%')
+			->order('name', Typecho_Db::SORT_DESC)
+			->limit(1)
+		);
+		
+		if($latestBackup){
+			$bsj = $latestBackup['value'];
+			$update = $db->update('table.options')->rows(array('value'=>$bsj))->where('name = ?', 'theme:'.$name);
+			$updateRows= $db->query($update);
+			echo '<div class="tongzhi col-mb-12 home">检测到模板备份数据，恢复完成，请等待自动刷新！如果等不到请点击';
+			?>	    
+			<a href="<?php Helper::options()->adminUrl('options-theme.php'); ?>">这里</a></div>
+			<script language="JavaScript">window.setTimeout("location='<?php Helper::options()->adminUrl('options-theme.php'); ?>'", 2000);</script>
+			<?php
+		}else{
+			echo '<div class="tongzhi col-mb-12 home">没有模板备份数据，恢复不了哦！</div>';
+		}
+	}
+	if($_POST["type"]=="删除备份数据"){
+		// 删除所有备份
+		$delete = $db->delete('table.options')->where('name LIKE ?', 'theme:'.$name.'bf_%');
+		$deletedRows = $db->query($delete);
+		echo '<div class="tongzhi col-mb-12 home">删除成功，请等待自动刷新，如果等不到请点击';
+		?>	    
 		<a href="<?php Helper::options()->adminUrl('options-theme.php'); ?>">这里</a></div>
 		<script language="JavaScript">window.setTimeout("location='<?php Helper::options()->adminUrl('options-theme.php'); ?>'", 2500);</script>
 		<?php
 	}
-	}
-			}
-	if($_POST["type"]=="还原模板设置数据"){
-	if($db->fetchRow($db->select()->from ('table.options')->where ('name = ?', 'theme:'.$name.'bf'))){
-	$sjdub=$db->fetchRow($db->select()->from ('table.options')->where ('name = ?', 'theme:'.$name.'bf'));
-	$bsj = $sjdub['value'];
-	$update = $db->update('table.options')->rows(array('value'=>$bsj))->where('name = ?', 'theme:'.$name);
-	$updateRows= $db->query($update);
-	echo '<div class="tongzhi col-mb-12 home">检测到模板备份数据，恢复完成，请等待自动刷新！如果等不到请点击';
-	?>    
-	<a href="<?php Helper::options()->adminUrl('options-theme.php'); ?>">这里</a></div>
-	<script language="JavaScript">window.setTimeout("location='<?php Helper::options()->adminUrl('options-theme.php'); ?>'", 2000);</script>
-	<?php
-	}else{
-	echo '<div class="tongzhi col-mb-12 home">没有模板备份数据，恢复不了哦！</div>';
-	}
-	}
-	if($_POST["type"]=="删除备份数据"){
-	if($db->fetchRow($db->select()->from ('table.options')->where ('name = ?', 'theme:'.$name.'bf'))){
-	$delete = $db->delete('table.options')->where ('name = ?', 'theme:'.$name.'bf');
-	$deletedRows = $db->query($delete);
-	echo '<div class="tongzhi col-mb-12 home">删除成功，请等待自动刷新，如果等不到请点击';
-	?>    
-	<a href="<?php Helper::options()->adminUrl('options-theme.php'); ?>">这里</a></div>
-	<script language="JavaScript">window.setTimeout("location='<?php Helper::options()->adminUrl('options-theme.php'); ?>'", 2500);</script>
-	<?php
-	}else{
-	echo '<div class="tongzhi col-mb-12 home">不用删了！备份不存在！！！</div>';
-	}
-	}
 		}
-	echo '<form class="protected home col-mb-12" action="?'.$name.'bf" method="post">
-	<input type="submit" name="type" class="btn btn-s" value="备份模板设置数据" />&nbsp;&nbsp;<input type="submit" name="type" class="btn btn-s" value="还原模板设置数据" />&nbsp;&nbsp;<input type="submit" name="type" class="btn btn-s" value="删除备份数据" /></form>';
+	
+	// 获取备份列表
+	$backups = $db->fetchAll(
+		$db->select()->from('table.options')
+		->where('name LIKE ?', 'theme:'.$name.'bf_%')
+		->order('name', Typecho_Db::SORT_DESC)
+	);
+	
+	echo '<style>
+	.btn { padding: 5px 10px; border: 1px solid #ddd; border-radius: 3px; cursor: pointer; font-size: 14px; }
+	.btn-primary { background-color: #4CAF50; color: white; border-color: #4CAF50; }
+	.btn-warning { background-color: #ff9800; color: white; border-color: #ff9800; }
+	.btn-danger { background-color: #f44336; color: white; border-color: #f44336; }
+	.btn:hover { opacity: 0.8; }
+	</style>
+	<form class="protected home col-mb-12" action="?'.$name.'bf" method="post">
+	<div>
+	<h3>主题设置备份管理</h3>
+	<div style="margin-bottom: 15px;">
+		<input type="submit" name="type" class="btn btn-s btn-primary" value="备份模板设置数据" onclick="return confirm(\'确定要备份当前设置吗？\')" />&nbsp;&nbsp;
+		<input type="submit" name="type" class="btn btn-s btn-warning" value="还原模板设置数据" onclick="return confirm(\'确定要恢复备份设置吗？这将覆盖当前的设置。\')" />&nbsp;&nbsp;
+		<input type="submit" name="type" class="btn btn-s btn-danger" value="删除备份数据" onclick="return confirm(\'确定要删除所有备份数据吗？此操作不可恢复。\')" />
+	</div>
+	';
+	
+	// 显示备份列表
+	if ($backups) {
+		echo '<div style="margin-top: 15px;">
+		<h4>备份列表（最近 ' . count($backups) . ' 个）</h4>
+		<ul style="list-style: none; padding: 0;">';
+		foreach ($backups as $backup) {
+			$backupName = $backup['name'];
+			$timestamp = str_replace('theme:'.$name.'bf_', '', $backupName);
+			$backupTime = date('Y-m-d H:i:s', $timestamp);
+			echo '<li style="margin: 5px 0; padding: 5px; background: #f5f5f5; border-radius: 3px;">
+				<strong>备份时间：</strong>' . $backupTime . '<br>
+				<strong>备份文件：</strong>' . $backupName . '
+			</li>';
+		}
+		echo '</ul>
+		</div>';
+	} else {
+		echo '<div style="margin-top: 15px; color: #999;">暂无备份数据</div>';
+	}
+	
+	echo '</div>
+	</form>';
 	// 主题设置备份结束
 }
 
