@@ -77,6 +77,9 @@ if ($this->options->ExpireNotice) {
     $daysSinceModified = ($currentTime - $modifiedTime) / 86400;
     if ($daysSinceModified > $expireDays) {echo '<div class="expire-notice" style="background:#f8f9fa;border-left:2px solid #6c757d;padding:6px 10px;margin-bottom:12px;border-radius:4px;"><p style="margin:0;">⚠️ 本文已超过 ' . $expireDays . ' 天未更新，部分内容可能具有时效性，请注意核实最新情况。</p></div>';}
 }
+// 表格响应式容器
+$content = preg_replace('/<table[^>]*>/', '<div class="table-container">$0', $content);
+$content = preg_replace('/<\/table>/', '</table></div>', $content);
 echo $content;
 ?>
 </div>
