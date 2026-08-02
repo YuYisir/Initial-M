@@ -61,20 +61,8 @@
 				<?php $this->widget('Initial_Widget_Comments_Recent', in_array('IgnoreAuthor', $this->options->sidebarBlock) ? 'ignoreAuthor=1' : '')->to($comments); ?>
 				<?php if ($comments->have()): ?>
 					<?php while ($comments->next()): ?>
-						<?php
-						$content_row = FindContent($comments->cid);
-						$content_widget = null;
-						if ($content_row) {
-							$content_widget = Typecho_Widget::widget('Widget_Abstract_Contents');
-							$content_widget->push($content_row);
-						}
-						$is_hidden = $content_widget && $content_widget->hidden;
-						$is_published = $content_widget && $content_widget->status == 'publish';
-						$is_whisper_template = $content_widget && $content_widget->template == 'page-whisper.php';
-						$show_link = !($is_hidden && $this->options->PjaxOption) && (!(!$is_published && !$is_whisper_template && $this->authorId !== $this->user->uid && !$this->user->pass('editor', true)));
-						$title_text = (!$is_published && !$is_whisper_template && $this->authorId !== $this->user->uid && !$this->user->pass('editor', true)) ? '此内容被作者隐藏' : $comments->title;
-						?>
-						<li><a <?php echo $show_link ? 'href="' . $comments->permalink . '" ' : '' ?>title="来自: <?php echo $title_text; ?>"><span class="comment-author-name"><?php $comments->author(false); ?></span><span class="comment-text">: <?php $comments->excerpt(35, '...'); ?></span></a></li>
+						<?php $permalink = $comments->permalink ?: ($this->options->rootUrl . '#' . $comments->cid); ?>
+						<li><a href="<?php echo $permalink; ?>" title="来自: <?php echo $comments->title; ?>"><span class="comment-author-name"><?php $comments->author(false); ?></span><span class="comment-text">: <?php $comments->excerpt(35, '...'); ?></span></a></li>
 					<?php endwhile; ?>
 				<?php else: ?>
 					<li>暂无回复</li>
