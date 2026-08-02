@@ -4,7 +4,7 @@
   <img src="screenshot.png" width="50%" height="auto" alt="主题封面">
 </div>
 
-![Version](https://img.shields.io/badge/version-3.2.8-blue)
+![Version](https://img.shields.io/badge/version-3.2.9-blue)
 ![Typecho](https://img.shields.io/badge/Typecho-1.3-green)
 ![PHP](https://img.shields.io/badge/PHP-8.1+-red)
 ![License](https://img.shields.io/badge/license-MIT-brightgreen)
@@ -82,9 +82,10 @@
 
 ## 📈 当前版本更新日志
 
-**当前版本：v3.2.8 (2026-04-08)**
+**当前版本：v3.2.9 (2026-07-26)**
 
-- **functions.php**: 优化主题设置备份功能，添加操作确认对话框防止误操作、使用不同颜色区分按钮类型、实现版本管理（自动保留最近2个备份）、添加备份列表显示方便查看
+- **sidebar.php**: 修复侧边栏最近回复中独立页面评论链接在未登录时不显示的问题，简化条件判断逻辑并添加 permalink 兜底处理
+- **main.min.js**: 修复返回顶部功能5个关键Bug，包括动画参数错误、指数衰减卡死、移动端无法打断动画、pjax切换后按钮失效、动画自取消等问题
 
 
 📄 查看完整详细历史更新请前往 [CHANGELOG.md](CHANGELOG.md)
