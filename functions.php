@@ -751,6 +751,12 @@ function FindContents($val = NULL, $order = 'order', $sort = 'a', $publish = NUL
 	return empty($rows) ? NULL : $rows;
 }
 
+// 使用 Typecho 的属性白名单过滤轻语内容，避免评论中的事件属性被执行。
+function filterWhisperContent($content, $allowedTags) {
+	$allowedTags .= '<a href="" title="" target=""><img src="" alt="" title="">' . Helper::options()->commentsHTMLTagAllowed;
+	return Typecho_Common::stripTags($content, $allowedTags);
+}
+
 function Whisper($sidebar = NULL) {
 	$db = Typecho_Db::get();
 	$options = Helper::options();
@@ -783,7 +789,7 @@ function Whisper($sidebar = NULL) {
 			if ($options->AttUrlReplace) {
 				$content = UrlReplace($content);
 			}
-			$content = strip_tags($content, '<p><br><strong><a><img><pre><code>'.$options->commentsHTMLTagAllowed) . ($sidebar ? PHP_EOL .'<li class="more"><a href="'.$widget->permalink.'">查看更多...</a></li>' : '');
+			$content = filterWhisperContent($content, '<p><br><strong><pre><code>') . ($sidebar ? PHP_EOL .'<li class="more"><a href="'.$widget->permalink.'">查看更多...</a></li>' : '');
 		} else {
 			$content = '<'.$p.'>暂无内容</'.$p.'>';
 		}
@@ -936,6 +942,12 @@ Typecho_Plugin::factory('Widget_Feedback')->trackback = array('CommentProtection
 Typecho_Plugin::factory('Widget_Feedback')->pingback = array('CommentProtection', 'verify');
 class CommentProtection {
     public static function verify($comment, $post, $result) {
+		// 轻语页面的顶级内容必须由 editor 在服务端授权。
+		if (isset($post->template) && $post->template === 'page-whisper.php'
+			&& empty($comment['parent'])
+			&& !Typecho_Widget::widget('Widget_User')->pass('editor', true)) {
+			throw new Typecho_Widget_Exception(_t('只有编辑可以发布轻语.', '评论失败'));
+		}
         if ($_REQUEST['text'] != null) {
             if($_POST['num1'] == null || $_POST['num2'] == null) {
                 throw new Typecho_Widget_Exception(_t('验证码异常.', '评论失败'));
