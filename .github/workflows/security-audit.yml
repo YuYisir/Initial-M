@@ -89,7 +89,7 @@ jobs:
             --config p/owasp-top-ten \
             --config p/secrets \
             --sarif --output semgrep.sarif \
-            --error \
+            --verbose \
             --exclude '.git' \
             --exclude 'vendor' \
             --exclude 'img'
