@@ -99,6 +99,7 @@ echo $commentClass;
 <p <?php if(!$this->user->hasLogin()): ?>class="textarea"<?php endif; ?>>
 <textarea name="text" id="textarea" placeholder="说点什么..." required ><?php $this->remember('text'); ?></textarea>
 </p>
+<?php spam_protection_math($this->cid);?>
 <p <?php if(!$this->user->hasLogin()): ?>class="textbutton"<?php endif; ?>>
 <?php if(!$this->user->hasLogin()): ?>
 <input type="text" name="author" id="author" class="text" placeholder="称呼 *" value="<?php $this->remember('author'); ?>" required />
