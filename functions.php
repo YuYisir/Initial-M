@@ -313,6 +313,12 @@ function themeConfig($form) {
 	
 	if(isset($_POST['type']))
 	{ 
+	// CSRF 校验：验证 Typecho 安全 token。
+	$security = Typecho_Widget::widget('Widget_Security');
+	$expected = $security->getToken('theme-backup');
+	if (!isset($_POST['_']) || $_POST['_'] !== $expected) {
+		echo '<div class="tongzhi col-mb-12 home">安全校验失败，请刷新页面后重试。</div>';
+	} else {
 	if($_POST["type"]=="备份模板设置数据"){
 		// 创建带时间戳的备份
 		$timestamp = time();
@@ -365,8 +371,9 @@ function themeConfig($form) {
 		<script language="JavaScript">window.setTimeout("location='<?php Helper::options()->adminUrl('options-theme.php'); ?>'", 2500);</script>
 		<?php
 	}
+	}
 		}
-	
+
 	// 获取备份列表
 	$backups = $db->fetchAll(
 		$db->select()->from('table.options')
@@ -382,6 +389,7 @@ function themeConfig($form) {
 	.btn:hover { opacity: 0.8; }
 	</style>
 	<form class="protected home col-mb-12" action="?'.$name.'bf" method="post">
+		<input type="hidden" name="_" value="' . Typecho_Widget::widget('Widget_Security')->getToken('theme-backup') . '" />
 	<div>
 	<h3>主题设置备份管理</h3>
 	<div style="margin-bottom: 15px;">
