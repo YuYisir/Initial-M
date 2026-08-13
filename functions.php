@@ -924,9 +924,12 @@ class myyodux {
 /* 增加评论验证*/
 function spam_protection_math() {
     $num1 = rand(1, 15);$num2 = rand(1, 15);
+    $expires = time() + 600;
+    $token = hash_hmac('sha256', "$num1:$num2:$expires", Helper::options()->secret);
     echo "<div style=\"display:flex;flex-direction: column;align-items: flex-start;\"><p for=\"math\" id=\"Verification_code\" style=\"margin:0\"><code>$num1</code>+<code>$num2</code> 等于：</p><input type=\"text\" name=\"sum\" class=\"text\" value=\"\" size=\"25\" id=\"sum\" tabindex=\"4\" style=\"flex:1\" placeholder=\"计算结果 *\">\n</div>";
     echo "<input type=\"hidden\" name=\"num1\" value=\"$num1\">\n";
     echo "<input type=\"hidden\" name=\"num2\" value=\"$num2\">";
+    echo "<input type=\"hidden\" name=\"verify_token\" value=\"$expires.$token\">";
 }
 /* 增加评论验证结束*/
 // 注册评论验证码验证
@@ -946,9 +949,20 @@ class CommentProtection {
                 throw new Typecho_Widget_Exception(_t('验证码异常.', '评论失败'));
             } else {
                 $sum = $_POST['sum'];
+                $verifyToken = $_POST['verify_token'] ?? '';
                 if ($sum == null) {
                     throw new Typecho_Widget_Exception(_t('请输入验证码.', '评论失败'));
-                } elseif ($sum != ($_POST['num1'] + $_POST['num2'])) {
+                }
+                // 校验验证码 token，防止客户端篡改题目参数。
+                $parts = explode('.', $verifyToken, 2);
+                if (count($parts) !== 2 || time() > (int)$parts[0]) {
+                    throw new Typecho_Widget_Exception(_t('验证码已过期，请刷新页面后重试.', '评论失败'));
+                }
+                $expected = hash_hmac('sha256', "{$_POST['num1']}:{$_POST['num2']}:{$parts[0]}", Helper::options()->secret);
+                if (!hash_equals($expected, $parts[1])) {
+                    throw new Typecho_Widget_Exception(_t('验证码无效，请刷新页面后重试.', '评论失败'));
+                }
+                if ($sum != ($_POST['num1'] + $_POST['num2'])) {
                     throw new Typecho_Widget_Exception(_t('验证码错误.', '评论失败'));
                 }
             }
