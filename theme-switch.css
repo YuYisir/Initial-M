@@ -377,15 +377,12 @@ html[data-theme="auto"] .theme-switcher__icon--auto {
 	color: var(--theme-text-muted);
 }
 
-.theme-dark .menu-parent ul,
-.theme-dark .nav-category-root > .nav-category-tree,
-.theme-dark .nav-menu > .nav-category-item > .nav-category-tree {
+.theme-dark .menu-parent ul {
 	background: rgba(32, 36, 40, .98);
 	border-color: var(--theme-border);
 	box-shadow: 0 8px 20px var(--theme-shadow);
 }
 
-.theme-dark .nav-category-tree .nav-category-tree,
 .theme-dark .menu-parent .menu-parent .menu-child {
 	background: rgba(41, 46, 51, .98);
 }
@@ -394,50 +391,10 @@ html[data-theme="auto"] .theme-switcher__icon--auto {
 	border-bottom-color: rgba(32, 36, 40, .98);
 }
 
-.theme-dark .nav-category-tree a:hover,
-.theme-dark .nav-category-tree a:focus-visible,
 .theme-dark .menu-parent ul a:hover,
 .theme-dark .menu-parent ul a:focus-visible {
 	color: var(--theme-text-strong);
 	background: rgba(255, 255, 255, .06);
-}
-
-.theme-dark .code-block {
-	background: #16191c;
-	border-color: var(--theme-border);
-	box-shadow: 0 2px 8px rgba(0, 0, 0, .2);
-}
-
-.theme-dark .code-block__toolbar {
-	color: var(--theme-text-muted);
-	background: #202428;
-	border-color: var(--theme-border);
-}
-
-.theme-dark .code-block__copy {
-	color: var(--theme-text-muted);
-	background: transparent;
-}
-
-.theme-dark .code-block__copy:hover,
-.theme-dark .code-block__copy:focus-visible {
-	color: var(--theme-accent);
-	background: #292e33;
-	border-color: #3a4148;
-}
-
-.theme-dark .code-block > pre > code {
-	color: #d8dee9;
-	background: transparent;
-}
-
-.theme-dark .code-block > pre {
-	background: transparent;
-	scrollbar-color: rgba(155, 163, 173, .4) transparent;
-}
-
-.theme-dark .code-block > pre::-webkit-scrollbar-thumb {
-	background: rgba(155, 163, 173, .4);
 }
 
 .theme-dark .hljs-comment,
@@ -508,14 +465,8 @@ html[data-theme="auto"] .theme-switcher__icon--auto {
 }
 
 @media (max-width: 600px) {
-	.theme-dark .menu-parent ul,
-	.theme-dark .nav-category-root > .nav-category-tree,
-	.theme-dark .nav-menu > .nav-category-item > .nav-category-tree {
+	.theme-dark .menu-parent ul {
 		background: rgba(32, 36, 40, .98);
-	}
-
-	.theme-dark .nav-category-tree .nav-category-tree {
-		background: rgba(41, 46, 51, .9);
 	}
 }
 
