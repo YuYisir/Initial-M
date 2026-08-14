@@ -1,0 +1,127 @@
+.nav-category-item {
+	position: relative;
+}
+
+.nav-category-tree {
+	margin: 0;
+	padding: 0;
+	min-width: 150px;
+	list-style: none;
+}
+
+.nav-category-tree li {
+	display: block;
+	margin: 0;
+	list-style: none;
+}
+
+.nav-category-tree li::marker {
+	content: '';
+}
+
+.nav-category-tree a {
+	display: block;
+	box-sizing: border-box;
+	padding: 6px 12px;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+.nav-category-tree .category-active > a,
+.nav-category-tree .category-parent-active > a {
+	font-weight: 700;
+}
+
+@media (min-width: 601px) {
+	.nav-category-root > .nav-category-tree,
+	.nav-menu > .nav-category-item > .nav-category-tree {
+		position: absolute;
+		top: 100%;
+		left: 50%;
+		z-index: 1000;
+		width: max-content;
+		max-width: 260px;
+		visibility: hidden;
+		opacity: 0;
+		background: rgba(238, 238, 238, .97);
+		border-radius: 5px;
+		box-shadow: 0 8px 20px rgba(15, 23, 42, .12);
+		transform: translateX(-50%);
+		transition: opacity .2s ease;
+	}
+
+	.nav-category-tree .nav-category-tree {
+		position: absolute;
+		top: 0;
+		right: calc(100% - 1px);
+		left: auto;
+		z-index: 1001;
+		width: max-content;
+		max-width: 260px;
+		visibility: hidden;
+		opacity: 0;
+		background: rgba(221, 221, 221, .98);
+		border-radius: 5px;
+		box-shadow: 0 8px 20px rgba(15, 23, 42, .12);
+		transform: none;
+		transition: opacity .2s ease;
+	}
+
+	.nav-category-root:hover > .nav-category-tree,
+	.nav-category-root:focus-within > .nav-category-tree,
+	.nav-category-item:hover > .nav-category-tree,
+	.nav-category-item:focus-within > .nav-category-tree {
+		visibility: visible;
+		opacity: 1;
+	}
+
+	.nav-category-root .nav-category-tree .nav-category-tree::before {
+		display: none;
+	}
+
+	.nav-category-tree a:hover,
+	.nav-category-tree a:focus-visible {
+		background: rgba(255, 255, 255, .55);
+	}
+}
+
+@media (max-width: 600px) {
+	.nav-category-root > .nav-category-tree,
+	.nav-menu > .nav-category-item > .nav-category-tree,
+	.nav-category-tree .nav-category-tree {
+		position: relative;
+		top: auto;
+		right: auto;
+		left: auto;
+		width: 82%;
+		min-width: 0;
+		max-width: none;
+		margin: 0 auto;
+		visibility: visible;
+		opacity: 1;
+		background: rgba(238, 238, 238, .95);
+		border-radius: 5px;
+		box-shadow: none;
+		transform: none;
+	}
+
+	.nav-category-tree .nav-category-tree {
+		width: 90%;
+		background: rgba(221, 221, 221, .7);
+	}
+
+	.nav-category-tree::before {
+		display: none;
+	}
+
+	.nav-category-tree a {
+		padding: 5px 10px;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.nav-category-tree {
+		transition: none !important;
+	}
+}

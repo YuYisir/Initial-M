@@ -95,6 +95,9 @@ if ($this->is('post') || $this->is('page')) {
 
 <?php $this->header('generator=&template=&pingback=&xmlrpc=&wlw=&commentReply=&rss1=&rss2=&antiSpam=&atom='); ?>
 <link rel="stylesheet" href="<?php cjUrl('style.min.css') ?>" />
+<?php if (!empty($this->options->Navset) && in_array('ShowCategory', $this->options->Navset)): ?>
+<link rel="stylesheet" href="<?php cjUrl('navigation-category-tree.css') ?>" />
+<?php endif; ?>
 <?php if ($this->options->CustomCSS): ?>
 <style type="text/css"><?php $this->options->CustomCSS(); ?></style>
 <?php endif; ?>
@@ -122,38 +125,8 @@ if ($this->is('post') || $this->is('page')) {
 </div>
 <ul class="nav-menu">
 <li><a href="<?php $this->options->siteUrl(); ?>">首页</a></li>
-<?php if (!empty($this->options->Navset) && in_array('ShowCategory', $this->options->Navset)): if (in_array('AggCategory', $this->options->Navset)): ?>
-<li class="menu-parent"><a><?php echo $this->options->CategoryText ? $this->options->CategoryText : '分类' ?></a>
-<ul>
-<?php
-endif;
-$this->widget('Widget_Metas_Category_List')->to($categorys);
-while($categorys->next()):
-if ($categorys->levels == 0):
-$children = $categorys->getAllChildren($categorys->mid);
-if (empty($children)):
-?>
-<li><a href="<?php $categorys->permalink(); ?>" title="<?php $categorys->name(); ?>"><?php $categorys->name(); ?></a></li>
-<?php else: ?>
-<li class="menu-parent">
-<a href="<?php $categorys->permalink(); ?>" title="<?php $categorys->name(); ?>"><?php $categorys->name(); ?></a>
-<ul class="menu-child">
-<?php foreach ($children as $mid) {
-$child = $categorys->getCategory($mid); ?>
-<li><a href="<?php echo $child['permalink'] ?>" title="<?php echo $child['name']; ?>"><?php echo $child['name']; ?></a></li>
-<?php } ?>
-</ul>
-</li>
-<?php
-endif;
-endif;
-endwhile;
-?>
-<?php if (in_array('AggCategory', $this->options->Navset)): ?>
-</ul>
-</li>
-<?php
-endif;
+<?php if (!empty($this->options->Navset) && in_array('ShowCategory', $this->options->Navset)):
+NavigationCategories($this, in_array('AggCategory', $this->options->Navset));
 endif;
 if (!empty($this->options->Navset) && in_array('ShowPage', $this->options->Navset)):
 if (in_array('AggPage', $this->options->Navset)):
