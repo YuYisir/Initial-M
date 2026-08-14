@@ -55,6 +55,7 @@ if ($page_links):
 <script src="//<?php if ($this->options->cjCDN == 'cf'): ?>cdnjs.cloudflare.com/ajax/libs/highlight.js/10.2.0/highlight.min.js<?php elseif ($this->options->cjCDN == 'sc'): ?>cdn.staticfile.org/highlight.js/10.2.0/highlight.min.js<?php else: ?>cdn.jsdelivr.net/gh/highlightjs/cdn-release@10.2.0/build/highlight.min.js<?php endif; ?>"></script>
 <?php endif;?><?php if($this->options->LazyLoad):?><!--懒加载库-按需加载--><script>(()=>{document.addEventListener('DOMContentLoaded',()=>{if(document.querySelector('img.lazyload')){let s=document.createElement('script');s.src='<?= $this->options->cjCDN=="cf"?"//cdnjs.cloudflare.com/ajax/libs/lazysizes/5.3.2/lazysizes.min.js":($this->options->cjCDN=="sc"?"//cdn.staticfile.org/lazysizes/5.3.2/lazysizes.min.js":"//cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js") ?>';s.async=true;document.head.appendChild(s)}})})();<?php endif;?></script>
 <script src="<?php cjUrl('main.min.js') ?>"></script>
+<script src="<?php cjUrl('theme-switch.js') ?>"></script>
 <?php $this->footer(); ?>
 <?php if ($this->options->CustomContent): $this->options->CustomContent(); ?>
 <?php endif; ?>

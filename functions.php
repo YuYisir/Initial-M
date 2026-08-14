@@ -18,6 +18,13 @@ function themeConfig($form) {
 	'title', _t('站点标题显示内容'), _t('默认仅显示文字标题，若要显示LOGO，请在上方添加 LOGO 地址'));
 	$form->addInput($titleForm);
 
+	$ThemeMode = new Typecho_Widget_Helper_Form_Element_Radio('ThemeMode',
+	array('auto' => _t('跟随系统'),
+	'light' => _t('浅色'),
+	'dark' => _t('深色')),
+	'auto', _t('默认配色模式'), _t('访客可在前台切换配色，手动选择会保存在当前浏览器中'));
+	$form->addInput($ThemeMode);
+
 	$subTitle = new Typecho_Widget_Helper_Form_Element_Text('subTitle', NULL, NULL, _t('自定义站点副标题'), _t('浏览器副标题，仅在当前页面为首页时显示，显示格式为：<b>标题 - 副标题</b>，留空则不显示副标题'));
 	$form->addInput($subTitle);
 
