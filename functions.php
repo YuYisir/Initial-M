@@ -313,6 +313,12 @@ function themeConfig($form) {
 	
 	if(isset($_POST['type']))
 	{ 
+	// CSRF 校验：验证 Typecho 安全 token。
+	$security = Typecho_Widget::widget('Widget_Security');
+	$expected = $security->getToken('theme-backup');
+	if (!isset($_POST['_']) || $_POST['_'] !== $expected) {
+		echo '<div class="tongzhi col-mb-12 home">安全校验失败，请刷新页面后重试。</div>';
+	} else {
 	if($_POST["type"]=="备份模板设置数据"){
 		// 创建带时间戳的备份
 		$timestamp = time();
@@ -365,8 +371,9 @@ function themeConfig($form) {
 		<script language="JavaScript">window.setTimeout("location='<?php Helper::options()->adminUrl('options-theme.php'); ?>'", 2500);</script>
 		<?php
 	}
+	}
 		}
-	
+
 	// 获取备份列表
 	$backups = $db->fetchAll(
 		$db->select()->from('table.options')
@@ -382,6 +389,7 @@ function themeConfig($form) {
 	.btn:hover { opacity: 0.8; }
 	</style>
 	<form class="protected home col-mb-12" action="?'.$name.'bf" method="post">
+		<input type="hidden" name="_" value="' . Typecho_Widget::widget('Widget_Security')->getToken('theme-backup') . '" />
 	<div>
 	<h3>主题设置备份管理</h3>
 	<div style="margin-bottom: 15px;">
@@ -418,6 +426,9 @@ function themeConfig($form) {
 
 function themeInit($archive) {
 	$options = Helper::options();
+	if ($archive->is('single') && $archive->allow('comment')) {
+		startCommentSession();
+	}
 	$options->commentsAntiSpam = false;
 	if ($options->PjaxOption || FindContents('page-whisper.php', 'commentsNum', 'd')) {
 		$options->commentsOrder = 'DESC';
@@ -751,6 +762,24 @@ function FindContents($val = NULL, $order = 'order', $sort = 'a', $publish = NUL
 	return empty($rows) ? NULL : $rows;
 }
 
+// 使用 Typecho 的属性白名单过滤轻语内容，避免评论中的事件属性被执行。
+function filterWhisperContent($content, $allowedTags) {
+	$allowedTags .= '<a href="" title="" target=""><img src="" alt="" title="">' . Helper::options()->commentsHTMLTagAllowed;
+	$content = Typecho_Common::stripTags($content, $allowedTags);
+	return preg_replace_callback('/\s(href|src)\s*=\s*([\'"])(.*?)\2/is', function($matches) {
+		$url = html_entity_decode($matches[3], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+		$normalized = preg_replace('/[\x00-\x20\x7f]+/', '', trim($url));
+		$scheme = parse_url($normalized, PHP_URL_SCHEME);
+		$allowed = strtolower($matches[1]) == 'href'
+			? array('http', 'https', 'mailto')
+			: array('http', 'https');
+		if ($scheme !== NULL && $scheme !== false && !in_array(strtolower($scheme), $allowed, true)) {
+			return '';
+		}
+		return $matches[0];
+	}, $content);
+}
+
 function Whisper($sidebar = NULL) {
 	$db = Typecho_Db::get();
 	$options = Helper::options();
@@ -783,7 +812,7 @@ function Whisper($sidebar = NULL) {
 			if ($options->AttUrlReplace) {
 				$content = UrlReplace($content);
 			}
-			$content = strip_tags($content, '<p><br><strong><a><img><pre><code>'.$options->commentsHTMLTagAllowed) . ($sidebar ? PHP_EOL .'<li class="more"><a href="'.$widget->permalink.'">查看更多...</a></li>' : '');
+			$content = filterWhisperContent($content, '<p><br><strong><pre><code>') . ($sidebar ? PHP_EOL .'<li class="more"><a href="'.$widget->permalink.'">查看更多...</a></li>' : '');
 		} else {
 			$content = '<'.$p.'>暂无内容</'.$p.'>';
 		}
@@ -923,11 +952,36 @@ class myyodux {
 }
 }/*回复可见样式结束*/
 /* 增加评论验证*/
-function spam_protection_math() {
+function startCommentSession() {
+	if (session_status() === PHP_SESSION_NONE) {
+		@session_start();
+	}
+	return session_status() === PHP_SESSION_ACTIVE;
+}
+
+function spam_protection_math($cid = 0) {
+	if (!startCommentSession()) {
+		echo '<p class="notice">验证码暂时不可用，请刷新页面后重试。</p>';
+		return;
+	}
     $num1 = rand(1, 15);$num2 = rand(1, 15);
+	$captchaId = bin2hex(random_bytes(16));
+	$now = time();
+	if (!isset($_SESSION['initial_math_challenges']) || !is_array($_SESSION['initial_math_challenges'])) {
+		$_SESSION['initial_math_challenges'] = array();
+	}
+	foreach ($_SESSION['initial_math_challenges'] as $key => $challenge) {
+		if (empty($challenge['expires']) || $challenge['expires'] < $now) {
+			unset($_SESSION['initial_math_challenges'][$key]);
+		}
+	}
+	$_SESSION['initial_math_challenges'][$captchaId] = array(
+		'answer' => $num1 + $num2,
+		'cid' => (int) $cid,
+		'expires' => $now + 600
+	);
     echo "<div style=\"display:flex;flex-direction: column;align-items: flex-start;\"><p for=\"math\" id=\"Verification_code\" style=\"margin:0\"><code>$num1</code>+<code>$num2</code> 等于：</p><input type=\"text\" name=\"sum\" class=\"text\" value=\"\" size=\"25\" id=\"sum\" tabindex=\"4\" style=\"flex:1\" placeholder=\"计算结果 *\">\n</div>";
-    echo "<input type=\"hidden\" name=\"num1\" value=\"$num1\">\n";
-    echo "<input type=\"hidden\" name=\"num2\" value=\"$num2\">";
+    echo "<input type=\"hidden\" name=\"captchaId\" value=\"$captchaId\">";
 }
 /* 增加评论验证结束*/
 // 注册评论验证码验证
@@ -936,17 +990,35 @@ Typecho_Plugin::factory('Widget_Feedback')->trackback = array('CommentProtection
 Typecho_Plugin::factory('Widget_Feedback')->pingback = array('CommentProtection', 'verify');
 class CommentProtection {
     public static function verify($comment, $post, $result) {
+		// 轻语页面的顶级内容必须由 editor 在服务端授权。
+		if ($post->template === 'page-whisper.php'
+			&& empty($comment['parent'])
+			&& !Typecho_Widget::widget('Widget_User')->pass('editor', true)) {
+			throw new Typecho_Widget_Exception(_t('只有编辑可以发布轻语.', '评论失败'));
+		}
         if ($_REQUEST['text'] != null) {
-            if($_POST['num1'] == null || $_POST['num2'] == null) {
-                throw new Typecho_Widget_Exception(_t('验证码异常.', '评论失败'));
-            } else {
-                $sum = $_POST['sum'];
-                if ($sum == null) {
-                    throw new Typecho_Widget_Exception(_t('请输入验证码.', '评论失败'));
-                } elseif ($sum != ($_POST['num1'] + $_POST['num2'])) {
-                    throw new Typecho_Widget_Exception(_t('验证码错误.', '评论失败'));
-                }
-            }
+			if (!startCommentSession()) {
+				throw new Typecho_Widget_Exception(_t('验证码异常.', '评论失败'));
+			}
+			$captchaId = isset($_POST['captchaId']) ? $_POST['captchaId'] : '';
+			$sum = isset($_POST['sum']) ? $_POST['sum'] : '';
+			$challenge = isset($_SESSION['initial_math_challenges'][$captchaId])
+				? $_SESSION['initial_math_challenges'][$captchaId]
+				: NULL;
+			if (!$challenge || $challenge['expires'] < time()) {
+				unset($_SESSION['initial_math_challenges'][$captchaId]);
+				throw new Typecho_Widget_Exception(_t('验证码已过期，请刷新页面后重试.', '评论失败'));
+			}
+			unset($_SESSION['initial_math_challenges'][$captchaId]);
+			if ((int) $post->cid !== (int) $challenge['cid']) {
+				throw new Typecho_Widget_Exception(_t('验证码异常.', '评论失败'));
+			}
+			if ($sum === '') {
+				throw new Typecho_Widget_Exception(_t('请输入验证码.', '评论失败'));
+			}
+			if (!ctype_digit((string) $sum) || (int) $sum !== (int) $challenge['answer']) {
+				throw new Typecho_Widget_Exception(_t('验证码错误.', '评论失败'));
+			}
         }return $comment;
     }
 }
