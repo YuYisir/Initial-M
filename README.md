@@ -4,7 +4,7 @@
   <img src="screenshot.png" width="50%" height="auto" alt="主题封面">
 </div>
 
-![Version](https://img.shields.io/badge/version-3.2.9-blue)
+![Version](https://img.shields.io/badge/version-3.3.0-blue)
 ![Typecho](https://img.shields.io/badge/Typecho-1.3-green)
 ![PHP](https://img.shields.io/badge/PHP-8.1+-red)
 ![License](https://img.shields.io/badge/license-MIT-brightgreen)
@@ -82,10 +82,13 @@
 
 ## 📈 当前版本更新日志
 
-**当前版本：v3.2.9 (2026-08-02)**
+**当前版本：v3.3.0 (2026-08-15)**
 
-- **sidebar.php**: 修复侧边栏最近回复中独立页面评论链接在未登录时不显示的问题，简化条件判断逻辑并添加 permalink 兜底处理
-- **main.min.js**: 修复返回顶部功能5个关键Bug，包括动画参数错误、指数衰减卡死、移动端无法打断动画、pjax切换后按钮失效、动画自取消等问题
+- **header.php**: 修复分页标题、canonical 与 SEO 元数据输出，补齐 Open Graph 与 Twitter Card，使用 json_encode 安全生成 JSON-LD
+- **functions.php**: 补充 SEO 描述字段与缩略图 alt 属性
+- **page-whisper.php**: 修复轻语 XSS、权限绕过、验证码绕过与相关安全问题
+- 新增 GitHub 安全审计工作流
+- 修复：按文件修改时间刷新静态资源缓存
 
 
 📄 查看完整详细历史更新请前往 [CHANGELOG.md](CHANGELOG.md)

@@ -1,5 +1,23 @@
 # Initial-M主题更新日志
 
+## v3.3.0 (2026-08-15)
+
+#### 1. SEO 元数据修复（[PR #1](https://github.com/YuYisir/Initial-M/pull/1) by @NHPT）
+- **header.php**: 修复分页标题、canonical 与 SEO 元数据输出，补齐 Open Graph 与 Twitter Card，使用 json_encode 安全生成 JSON-LD
+- **functions.php**: 补充 SEO 描述字段与缩略图 alt 属性
+
+#### 2. 安全问题修复（[PR #2](https://github.com/YuYisir/Initial-M/pull/2) by @NHPT）
+- **page-whisper.php**: 修复轻语 XSS、权限绕过、验证码绕过与相关安全问题
+
+#### 3. GitHub 安全审计工作流（[PR #4](https://github.com/YuYisir/Initial-M/pull/4) by @NHPT）
+- 新增 GitHub 安全审计工作流
+
+#### 4. 静态资源缓存刷新修复（[PR #10](https://github.com/YuYisir/Initial-M/pull/10) by @NHPT）
+- 修复：按文件修改时间刷新静态资源缓存
+
+> **新贡献者**: @NHPT 在 [PR #1](https://github.com/YuYisir/Initial-M/pull/1) 中首次贡献  
+> **完整对比**: [v3.2.9...v3.3.0](https://github.com/YuYisir/Initial-M/compare/v3.2.9...v3.3.0)
+
 ## v3.2.9 (2026-08-02)
 
 #### 1. 侧边栏评论链接修复
