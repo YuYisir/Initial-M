@@ -439,7 +439,13 @@ function themeInit($archive) {
 
 function cjUrl($path) {
 	$options = Helper::options();
-	$ver = '?ver='.constant("INITIAL_VERSION_NUMBER");
+	$version = constant("INITIAL_VERSION_NUMBER");
+	$assetPath = __DIR__ . '/' . ltrim($path, '/');
+	$modified = is_file($assetPath) ? @filemtime($assetPath) : false;
+	if ($modified) {
+		$version .= '.' . $modified;
+	}
+	$ver = '?ver=' . rawurlencode($version);
 	if ($options->cjcdnAddress) {
 		echo rtrim($options->cjcdnAddress, '/').'/'.$path.$ver;
 	} else {
