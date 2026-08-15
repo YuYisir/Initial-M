@@ -489,11 +489,9 @@ function postThumb($obj) {
 	if (Helper::options()->AttUrlReplace) {
 		$thumb = UrlReplace($thumb);
 	}
-	// 缩略图使用文章标题作为替代文本，避免列表图片缺少 alt。
-	$alt = htmlspecialchars($obj->title, ENT_QUOTES, 'UTF-8');
     return Helper::options()->LazyLoad 
-        ? '<img class="lazyload" data-src="'.$thumb.'" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" loading="lazy" alt="'.$alt.'" />'
-        : '<img src="'.$thumb.'" alt="'.$alt.'" />';
+        ? '<img class="lazyload" data-src="'.$thumb.'" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" loading="lazy" />'
+        : '<img src="'.$thumb.'" />';
 }
 
 function Postviews($archive) {
@@ -892,11 +890,6 @@ function compressHtml($html_source) {
 }
 
 function themeFields($layout) {
-	// 可选的文章级 SEO 描述，留空时自动使用正文摘要。
-	$description = new Typecho_Widget_Helper_Form_Element_Textarea('description', NULL, NULL, _t('SEO 描述'), _t('用于搜索结果和社交分享，建议控制在 80～160 个字符；留空则自动使用正文摘要'));
-	$description->input->setAttribute('class', 'w-100');
-	$layout->addItem($description);
-
 	$thumb = new Typecho_Widget_Helper_Form_Element_Text('thumb', NULL, NULL, _t('自定义缩略图'), _t('在这里填入一个图片 URL 地址, 以添加本文的缩略图，若填入纯数字，例如 <b>3</b> ，则使用文章第三张图片作为缩略图（对应位置无图则不显示缩略图），留空则默认不显示缩略图'));
 	$thumb->input->setAttribute('class', 'w-100');
 	$layout->addItem($thumb);
