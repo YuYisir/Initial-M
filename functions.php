@@ -477,6 +477,7 @@ function lazyLoadImages($content) {
         // 首图片不懒加载
         if ($count == 1) return $img;
         // 后续图片懒加载
+        $img = preg_replace('/\s+src=["\'][^"\']+["\']/i', '', $img, 1);
         return str_replace('<img', '<img class="lazyload" data-src="'.$matches[2].'" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" loading="lazy"', $img);
     }, $content);
 }
