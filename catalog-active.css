@@ -1,0 +1,34 @@
+#catalog-col a {
+	display: block;
+	margin-left: -6px;
+	padding: 2px 6px;
+	border: 0;
+	border-radius: 2px;
+	transition:
+		color .2s ease,
+		background-color .2s ease,
+		box-shadow .2s ease;
+}
+
+#catalog-col li.catalog-active-path > a {
+	color: #fff;
+}
+
+#catalog-col a.catalog-active-link,
+#catalog-col a[aria-current="location"] {
+	color: #fff;
+	background: rgba(255, 255, 255, .16);
+	box-shadow: inset 2px 0 0 currentColor;
+	font-weight: 700;
+}
+
+#catalog-col a:focus-visible {
+	outline: 2px solid rgba(255, 255, 255, .75);
+	outline-offset: 1px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	#catalog-col a {
+		transition: none;
+	}
+}

@@ -122,6 +122,9 @@ if ($this->is('post') || $this->is('page')) {
 <?php // description 和 social 由主题输出，避免与 Typecho 1.3 核心重复。
 $this->header('description=&social=&generator=&template=&pingback=&xmlrpc=&wlw=&commentReply=&rss1=&rss2=&antiSpam=&atom='); ?>
 <link rel="stylesheet" href="<?php cjUrl('style.min.css') ?>" />
+<?php if ($this->options->catalog): ?>
+<link rel="stylesheet" href="<?php cjUrl('catalog-active.css') ?>" />
+<?php endif; ?>
 <?php if ($this->options->CustomCSS): ?>
 <style type="text/css"><?php $this->options->CustomCSS(); ?></style>
 <?php endif; ?>
