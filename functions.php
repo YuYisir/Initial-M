@@ -944,19 +944,108 @@ function themeFields($layout) {
 	$layout->addItem($catalog);
 }
 /*回复可见样式开始*/
-Typecho_Plugin::factory('Widget_Abstract_Contents')->excerptEx = array('myyodux','one');
-Typecho_Plugin::factory('Widget_Abstract_Contents')->contentEx = array('myyodux','one');
-class myyodux {
-    public static function one($con,$obj,$text)
-    {
-      $text = empty($text)?$con:$text;
-      if(!$obj->is('single')){
-      $text = preg_replace_callback('/(```[\s\S]*?```|`[^`]+`|<code[\s\S]*?<\/code>|<pre[\s\S]*?<\/pre>)/', function($matches) {
-          return str_replace(array('[hidden]', '[/hidden]'), array('&#91;hidden&#93;', '&#91;/hidden&#93;'), $matches[0]);
-      }, $text);
-      $text = preg_replace("/\[hidden\](.*?)\[\/hidden\]/sm",'',$text);
-      }return $text;
-}
+Typecho_Plugin::factory('Widget_Abstract_Contents')->excerptEx = array('InitialHiddenContent', 'filterExcerpt');
+Typecho_Plugin::factory('Widget_Abstract_Contents')->contentEx = array('InitialHiddenContent', 'filterContent');
+Typecho_Plugin::factory('Widget_Feedback')->finishComment = array('InitialHiddenContent', 'grantAfterComment');
+class InitialHiddenContent {
+	const COOKIE_PREFIX = 'initial_hidden_';
+	const COOKIE_LIFETIME = 2592000;
+
+	private static function protectCode($text) {
+		return preg_replace_callback('/(```[\s\S]*?```|`[^`]+`|<code[\s\S]*?<\/code>|<pre[\s\S]*?<\/pre>)/', function($matches) {
+			return str_replace(
+				array('[hidden]', '[/hidden]'),
+				array('&#91;hidden&#93;', '&#91;/hidden&#93;'),
+				$matches[0]
+			);
+		}, $text);
+	}
+
+	private static function replace($text, $visible, $showPlaceholder = false) {
+		$text = self::protectCode($text);
+		$text = preg_replace_callback('/\[hidden\](.*?)(?:\[\/hidden\]|$)/is', function($matches) use ($visible, $showPlaceholder) {
+			if ($visible) {
+				return '<div class="reply2view">'.$matches[1].'</div>';
+			}
+			return $showPlaceholder
+				? '<div class="reply2view">此处内容需要评论回复后方可阅读</div>'
+				: '';
+		}, $text);
+		return str_replace('[/hidden]', '', $text);
+	}
+
+	private static function cookieName($cid) {
+		return self::COOKIE_PREFIX.(int) $cid;
+	}
+
+	private static function signature($cid, $coid, $expires) {
+		return hash_hmac(
+			'sha256',
+			(int) $cid.'|'.(int) $coid.'|'.(int) $expires,
+			(string) Helper::options()->secret
+		);
+	}
+
+	public static function filterExcerpt($con, $obj, $text) {
+		return self::replace(empty($text) ? $con : $text, false);
+	}
+
+	public static function filterContent($con, $obj, $text) {
+		$text = empty($text) ? $con : $text;
+		return $obj->is('single')
+			? self::render($text, $obj->cid)
+			: self::replace($text, false);
+	}
+
+	public static function strip($text) {
+		return self::replace($text, false);
+	}
+
+	public static function canView($cid) {
+		if (Typecho_Widget::widget('Widget_User')->hasLogin()) {
+			return true;
+		}
+
+		$value = Typecho_Cookie::get(self::cookieName($cid));
+		if (!$value || substr_count($value, '.') !== 2) {
+			return false;
+		}
+
+		list($coid, $expires, $signature) = explode('.', $value, 3);
+		if (!ctype_digit($coid) || !ctype_digit($expires) || (int) $expires < time()) {
+			return false;
+		}
+
+		if (!hash_equals(self::signature($cid, $coid, $expires), $signature)) {
+			return false;
+		}
+
+		$db = Typecho_Db::get();
+		return (bool) $db->fetchRow(
+			$db->select('coid')->from('table.comments')
+				->where('coid = ? AND cid = ?', (int) $coid, (int) $cid)
+				->where('type = ? AND status = ?', 'comment', 'approved')
+				->limit(1)
+		);
+	}
+
+	public static function render($text, $cid) {
+		return self::replace($text, self::canView($cid), true);
+	}
+
+	public static function grantAfterComment($feedback) {
+		if ($feedback->type !== 'comment') {
+			return;
+		}
+
+		$expires = time() + self::COOKIE_LIFETIME;
+		$value = (int) $feedback->coid.'.'.$expires.'.'.self::signature(
+			$feedback->cid,
+			$feedback->coid,
+			$expires
+		);
+		Typecho_Cookie::set(self::cookieName($feedback->cid), $value, $expires);
+	}
 }/*回复可见样式结束*/
 /* 增加评论验证*/
 function startCommentSession() {
