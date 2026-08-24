@@ -135,7 +135,7 @@ function themeConfig($form) {
 	$Highlight = new Typecho_Widget_Helper_Form_Element_Radio('Highlight', 
 	array(1 => _t('启用'),
 	0 => _t('关闭')),
-	0, _t('代码高亮'), _t('默认关闭，启用则会渲染页面内代码块”'));
+	0, _t('代码高亮'), _t('默认关闭，启用后渲染代码高亮，并显示语言和复制按钮'));
 	$form->addInput($Highlight);
 
 	$LazyLoad = new Typecho_Widget_Helper_Form_Element_Radio('LazyLoad', 
