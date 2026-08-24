@@ -4,7 +4,7 @@
   <img src="screenshot.png" width="50%" height="auto" alt="主题封面">
 </div>
 
-![Version](https://img.shields.io/badge/version-3.3.0-blue)
+![Version](https://img.shields.io/badge/version-3.4.0-blue)
 ![Typecho](https://img.shields.io/badge/Typecho-1.3-green)
 ![PHP](https://img.shields.io/badge/PHP-8.1+-red)
 ![License](https://img.shields.io/badge/license-MIT-brightgreen)
@@ -82,13 +82,12 @@
 
 ## 📈 当前版本更新日志
 
-**当前版本：v3.3.0 (2026-08-15)**
+**当前版本：v3.4.0 (2026-08-24)**
 
-- **header.php**: 修复分页标题、canonical 与 SEO 元数据输出，补齐 Open Graph 与 Twitter Card，使用 json_encode 安全生成 JSON-LD
-- **functions.php**: 补充 SEO 描述字段与缩略图 alt 属性
-- **page-whisper.php**: 修复轻语 XSS、权限绕过、验证码绕过与相关安全问题
-- 新增 GitHub 安全审计工作流
-- 修复：按文件修改时间刷新静态资源缓存
+- 新增：代码块语言标识与复制功能（PR #8）
+- 新增：代码块经典与增强样式切换
+- 修复：代码高亮解析与语言支持（PR #14）
+- 修复：懒加载图片生成重复 src 属性（PR #12）
 
 
 📄 查看完整详细历史更新请前往 [CHANGELOG.md](CHANGELOG.md)

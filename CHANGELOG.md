@@ -1,5 +1,28 @@
 # Initial-M主题更新日志
 
+## v3.4.0 (2026-08-24)
+
+#### 1. 代码块语言标识与复制功能（[PR #8](https://github.com/YuYisir/Initial-M/pull/8) by @NHPT）
+- **code-block-tools.css**: 新增代码块工具样式
+- **code-block-tools.js**: 新增代码块复制按钮与语言标签功能
+- **functions.php**: 添加相关配置项
+- **header.php**: 引入代码块工具资源
+
+#### 2. 代码块经典与增强样式切换（by @YuYisir）
+- **code-block-tools.css**: 新增经典与增强两种代码块样式
+- **code-block-tools.js**: 支持样式切换逻辑
+- **functions.php**: 添加样式切换配置
+- **header.php**: 引入样式资源
+
+#### 3. 代码高亮解析与语言支持修复（[PR #14](https://github.com/YuYisir/Initial-M/pull/14) by @NHPT）
+- **footer.php**: 修复代码高亮初始化逻辑
+- **main.min.js**: 修正语言识别与高亮解析
+
+#### 4. 懒加载图片重复 src 属性修复（[PR #12](https://github.com/YuYisir/Initial-M/pull/12) by @NHPT）
+- **functions.php**: 避免懒加载图片生成重复 src 属性
+
+> **完整对比**: [v3.3.0...v3.4.0](https://github.com/YuYisir/Initial-M/compare/v3.3.0...v3.4.0)
+
 ## v3.3.0 (2026-08-15)
 
 #### 1. SEO 元数据修复（[PR #1](https://github.com/YuYisir/Initial-M/pull/1) by @NHPT）
