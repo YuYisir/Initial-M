@@ -125,3 +125,34 @@
 		transition: none;
 	}
 }
+
+.code-block--classic {
+    margin: 1em 0;
+    background: #f7f3f7;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+.code-block--classic .code-block__toolbar {
+    display: none;
+}
+
+.code-block--classic > pre {
+    margin: 0;
+    padding: 8px;
+    max-height: 400px;
+    background: #f7f3f7;
+    border: 0;
+    border-radius: 0;
+}
+
+.code-block--classic > pre > code {
+    display: block;
+    padding: 3px;
+    color: #444;
+    background: #f7f3f7;
+    font-family: Consolas, Inconsolata, Courier, monospace, "PingFang SC", "Microsoft YaHei", sans-serif;
+    font-size: .9em;
+    line-height: normal;
+}

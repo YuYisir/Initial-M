@@ -138,6 +138,12 @@ function themeConfig($form) {
 	0, _t('代码高亮'), _t('默认关闭，启用后渲染代码高亮，并显示语言和复制按钮'));
 	$form->addInput($Highlight);
 
+	$CodeBlockStyle = new Typecho_Widget_Helper_Form_Element_Radio('CodeBlockStyle',
+	array(1 => _t('增强'),
+	0 => _t('经典')),
+	1, _t('代码块样式'), _t('默认使用增强样式，可切换为经典样式'));
+	$form->addInput($CodeBlockStyle);
+
 	$LazyLoad = new Typecho_Widget_Helper_Form_Element_Radio('LazyLoad', 
 	array(1 => _t('启用'),
 	0 => _t('关闭')),

@@ -124,6 +124,9 @@ $this->header('description=&social=&generator=&template=&pingback=&xmlrpc=&wlw=&
 <link rel="stylesheet" href="<?php cjUrl('style.min.css') ?>" />
 <?php if ($this->options->Highlight): ?>
 <link rel="stylesheet" href="<?php cjUrl('code-block-tools.css') ?>" />
+<script>
+window.codeBlockStyle = <?php echo (int)($this->options->CodeBlockStyle ?? 1); ?>;
+</script>
 <?php endif; ?>
 <?php if ($this->options->CustomCSS): ?>
 <style type="text/css"><?php $this->options->CustomCSS(); ?></style>

@@ -1,6 +1,6 @@
 (function () {
 	'use strict';
-
+	var codeBlockStyle = window.codeBlockStyle;
 	var languageNames = {
 		bash: 'Bash',
 		c: 'C',
@@ -123,6 +123,9 @@
 		var copyButton = document.createElement('button');
 
 		wrapper.className = 'code-block';
+		if (codeBlockStyle === 0) {
+			wrapper.classList.add('code-block--classic');
+		}
 		toolbar.className = 'code-block__toolbar';
 		language.className = 'code-block__language';
 		copyButton.className = 'code-block__copy';
