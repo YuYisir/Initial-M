@@ -84,10 +84,10 @@
 
 **当前版本：v3.5.0 (2026-08-30)**
 
-- 修复：回复可见内容访问控制（PR #13）
-- 新增：导航栏多级分类菜单，样式沿用原版风格（PR #5）
-- 新增：全局明暗主题切换，亮/暗/自动三档（PR #7）
-- 新增：推荐文章展示，优先同标签/分类补齐最新文章（PR #9）
+- 修复：回复可见内容访问控制（[PR #13](https://github.com/YuYisir/Initial-M/pull/13)）
+- 新增：导航栏多级分类菜单，样式沿用原版风格（[PR #5](https://github.com/YuYisir/Initial-M/pull/5)）
+- 新增：全局明暗主题切换，亮/暗/自动三档（[PR #7](https://github.com/YuYisir/Initial-M/pull/7)）
+- 新增：推荐文章展示，优先同标签/分类补齐最新文章（[PR #9](https://github.com/YuYisir/Initial-M/pull/9)）
 - 调整：分类菜单与主题切换样式适配，PR 新增静态资源压缩
 
 
