@@ -96,6 +96,9 @@ echo $content;
 </div>
 <?php endif; ?>
 </article>
+<?php if ($this->options->RelatedPosts):
+InitialRelatedPosts($this, $this->options->RelatedPostsNumber);
+endif; ?>
 <?php $this->need('comments.php'); ?>
 <ul class="post-near">
 <li>上一篇: <?php $this->thePrev('%s','没有了'); ?></li>

@@ -185,6 +185,9 @@ window.codeBlockStyle = <?php echo (int)($this->options->CodeBlockStyle ?? 1); ?
 <link rel="stylesheet" href="<?php cjUrl('navigation-category-tree.css') ?>" />
 <?php endif; ?>
 <link rel="stylesheet" href="<?php cjUrl('theme-switch.css') ?>" />
+<?php if ($this->options->RelatedPosts): ?>
+<link rel="stylesheet" href="<?php cjUrl('related-posts.css') ?>" />
+<?php endif; ?>
 <?php if ($this->options->CustomCSS): ?>
 <style type="text/css"><?php $this->options->CustomCSS(); ?></style>
 <?php endif; ?>

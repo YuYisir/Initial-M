@@ -189,6 +189,20 @@ function themeConfig($form) {
 	'post', _t('文章目录'), _t('一键开关全部文章目录，默认使用文章内的设定，（若文章内无任何标题，则不显示目录）'));
 	$form->addInput($catalog);
 
+	$RelatedPosts = new Typecho_Widget_Helper_Form_Element_Radio('RelatedPosts',
+	array(1 => _t('启用'),
+	0 => _t('关闭')),
+	0, _t('推荐文章'), _t('默认关闭，启用后在文章版权声明之后显示推荐内容'));
+	$form->addInput($RelatedPosts);
+
+	$RelatedPostsNumber = new Typecho_Widget_Helper_Form_Element_Select('RelatedPostsNumber',
+	array(3 => _t('3 篇'),
+	4 => _t('4 篇'),
+	6 => _t('6 篇'),
+	8 => _t('8 篇')),
+	4, _t('推荐文章数量'), _t('优先推荐相同标签和分类的文章，不足时使用最新文章补齐'));
+	$form->addInput($RelatedPostsNumber);
+
 	$scrollTop = new Typecho_Widget_Helper_Form_Element_Radio('scrollTop', 
 	array(1 => _t('启用'),
 	0 => _t('关闭')),
@@ -787,6 +801,138 @@ function Contents_Post_Random($limit = 10) {
 	} else {
 		echo '<li>暂无文章</li>'.PHP_EOL;
 	}
+}
+
+function InitialRelatedPosts($archive, $limit = 4) {
+	if (!$archive->is('post') || $archive->hidden) {
+		return;
+	}
+
+	$limit = max(1, min(8, (int) $limit));
+	$db = Typecho_Db::get();
+	$options = Helper::options();
+	$posts = array();
+	$excluded = array((int) $archive->cid);
+
+	// 沿用 Typecho 核心 Related 组件的字段和过滤条件，分阶段补足推荐结果。
+	$getMetaIds = function($metas) {
+		$ids = array();
+		if (!is_array($metas)) {
+			return $ids;
+		}
+
+		foreach ($metas as $meta) {
+			if (isset($meta['mid'])) {
+				$ids[] = (int) $meta['mid'];
+			}
+		}
+
+		return array_values(array_unique(array_filter($ids)));
+	};
+
+	$fetchByMetas = function($metaIds, $count) use ($db, $options, &$excluded) {
+		if (!$metaIds || $count < 1) {
+			return array();
+		}
+
+		$metaIds = array_map('intval', $metaIds);
+		$excludedIds = array_map('intval', $excluded);
+		$select = $db->select(
+			'DISTINCT table.contents.cid',
+			'table.contents.title',
+			'table.contents.slug',
+			'table.contents.created',
+			'table.contents.authorId',
+			'table.contents.modified',
+			'table.contents.type',
+			'table.contents.status',
+			'table.contents.text',
+			'table.contents.commentsNum',
+			'table.contents.order',
+			'table.contents.template',
+			'table.contents.password',
+			'table.contents.allowComment',
+			'table.contents.allowPing',
+			'table.contents.allowFeed'
+		)->from('table.contents')
+			->join('table.relationships', 'table.contents.cid = table.relationships.cid')
+			->where('table.relationships.mid IN (' . implode(',', $metaIds) . ')')
+			->where('table.contents.cid NOT IN (' . implode(',', $excludedIds) . ')')
+			->where('table.contents.status = ?', 'publish')
+			->where('table.contents.password IS NULL')
+			->where('table.contents.created < ?', $options->time)
+			->where('table.contents.type = ?', 'post')
+			->order('table.contents.created', Typecho_Db::SORT_DESC)
+			->limit($count);
+
+		return $db->fetchAll($select);
+	};
+
+	$appendPosts = function($items) use (&$posts, &$excluded, $limit) {
+		foreach ($items as $item) {
+			$cid = isset($item['cid']) ? (int) $item['cid'] : 0;
+			if (!$cid || in_array($cid, $excluded, true)) {
+				continue;
+			}
+
+			$posts[] = $item;
+			$excluded[] = $cid;
+
+			if (count($posts) >= $limit) {
+				break;
+			}
+		}
+	};
+
+	$appendPosts($fetchByMetas(
+		$getMetaIds($archive->tags),
+		$limit - count($posts)
+	));
+	$appendPosts($fetchByMetas(
+		$getMetaIds($archive->categories),
+		$limit - count($posts)
+	));
+
+	if (count($posts) < $limit) {
+		$latest = $db->fetchAll(
+			$db->select()->from('table.contents')
+			->where('table.contents.cid NOT IN (' . implode(',', array_map('intval', $excluded)) . ')')
+			->where('table.contents.status = ?', 'publish')
+			->where('table.contents.password IS NULL')
+			->where('table.contents.created < ?', $options->time)
+			->where('table.contents.type = ?', 'post')
+			->order('table.contents.created', Typecho_Db::SORT_DESC)
+			->limit($limit - count($posts))
+		);
+		$appendPosts($latest);
+	}
+
+	if (!$posts) {
+		return;
+	}
+
+	$widget = Typecho_Widget::widget('Widget_Abstract_Contents@relatedPosts');
+	echo '<section class="related-posts" aria-labelledby="related-posts-title">' . PHP_EOL;
+	echo '<h2 id="related-posts-title" class="related-posts__title">' . _t('推荐文章') . '</h2>' . PHP_EOL;
+	echo '<ul class="related-posts__list">' . PHP_EOL;
+
+	foreach ($posts as $post) {
+		$widget->push($post);
+		$title = htmlspecialchars(
+			strip_tags(htmlspecialchars_decode($widget->title, ENT_QUOTES)),
+			ENT_QUOTES,
+			'UTF-8'
+		);
+		$permalink = htmlspecialchars($widget->permalink, ENT_QUOTES, 'UTF-8');
+		$created = (int) $post['created'];
+
+		echo '<li class="related-posts__item"><a href="' . $permalink . '">'
+			. '<span class="related-posts__name">' . $title . '</span>'
+			. '<time datetime="' . date('c', $created) . '">'
+			. date('Y-m-d', $created) . '</time></a></li>' . PHP_EOL;
+	}
+
+	echo '</ul>' . PHP_EOL . '</section>' . PHP_EOL;
 }
 
 class Initial_Widget_Comments_Recent extends Widget_Abstract_Comments
