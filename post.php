@@ -4,7 +4,7 @@ if (!isset($cover)) {
     $cover = '';
     if ($this->is('post') || $this->is('page')) {
         if (!empty($this->fields->thumb)) {$cover = $this->fields->thumb;
-        } elseif ($this->options->autoFetchCover && preg_match('/<img.*?src="(.*?)"/', $this->content, $matches)) {$cover = $matches[1];} else {$cover = $this->options->defaultCover ? $this->options->defaultCover : $this->options->themeUrl . '/img/default-cover.webp';}
+        } elseif ($this->options->autoFetchCover && preg_match('/<img.*?src="(.*?)"/', InitialHiddenContent::strip($this->content), $matches)) {$cover = $matches[1];} else {$cover = $this->options->defaultCover ? $this->options->defaultCover : $this->options->themeUrl . '/img/default-cover.webp';}
     }
 }
 $this->need('header.php');
@@ -45,7 +45,7 @@ if (isset($this->categories) && count($this->categories) > 0) {
 <meta itemprop="name" content="<?php $this->author(); ?>" />
 <meta itemprop="url" content="<?php $this->author->permalink(); ?>" />
 </div>
-<h1 class="post-title" itemprop="headline"><a href="<?php $this->permalink() ?>" itemprop="url"><?php $this->title() ?></a></h1>
+<h1 class="post-title" itemprop="headline"><a href="<?php $this->permalink() ?>" itemprop="url"><?php $this->title() ?></a><?php echo recentlyUpdatedBadge($this); ?></h1>
 <ul class="post-meta">
 <li itemprop="datePublished" content="<?php $this->date('c'); ?>"><?php $this->date(); ?></li>
 <li><?php $this->category(','); ?></li>
@@ -56,19 +56,7 @@ if (isset($this->categories) && count($this->categories) > 0) {
 <!-- 回复可见开始 此处注释的为原版内容：?php $this->content(); ?>-->
 <div class="post-content" itemprop="articleBody">
 <?php
-$content = $this->content;
-if (strpos($content, '[hidden]') !== false) {
-    $content = preg_replace_callback('/(```[\s\S]*?```|`[^`]+`|<code[\s\S]*?<\/code>|<pre[\s\S]*?<\/pre>)/', function($matches) {
-        return str_replace(array('[hidden]', '[/hidden]'), array('&#91;hidden&#93;', '&#91;/hidden&#93;'), $matches[0]);}, $content);
-    if (strpos($content, '[hidden]') !== false) {$hasPermission = false;
-        if ($this->user->hasLogin()) {$hasPermission = true;} else {$mail = $this->remember('mail', true);
-            if ($mail) {
-                $db = Typecho_Db::get();
-                $result = $db->fetchRow($db->select('coid')->from('table.comments')->where('cid = ?', $this->cid)->where('mail = ?', $mail)->where('status = ?', 'approved')->limit(1));
-                if ($result) {$hasPermission = true;}}}
-        if ($hasPermission) {$content = preg_replace("/\[hidden\](.*?)\[\/hidden\]/sm", '<div class="reply2view">$1</div>', $content);
-        } else {$content = preg_replace("/\[hidden\](.*?)\[\/hidden\]/sm", '<div class="reply2view">此处内容需要评论回复后方可阅读</div>', $content);}}
-}
+	$content = $this->content;
 // 文章过期提醒
 if ($this->options->ExpireNotice) {
     $expireDays = intval($this->options->ExpireNoticeDays) ?: 180;
@@ -108,6 +96,9 @@ echo $content;
 </div>
 <?php endif; ?>
 </article>
+<?php if ($this->options->RelatedPosts):
+InitialRelatedPosts($this, $this->options->RelatedPostsNumber);
+endif; ?>
 <?php $this->need('comments.php'); ?>
 <ul class="post-near">
 <li>上一篇: <?php $this->thePrev('%s','没有了'); ?></li>

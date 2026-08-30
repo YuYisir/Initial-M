@@ -1,5 +1,85 @@
 # Initial-M主题更新日志
 
+## v3.5.0 (2026-08-30)
+
+#### 1. 回复可见内容访问控制修复（[PR #13](https://github.com/YuYisir/Initial-M/pull/13) by @NHPT）
+- **functions.php**: 重构回复可见内容的访问控制逻辑，修复权限校验漏洞
+- **header.php** / **post.php**: 配合调整内容输出结构
+
+#### 2. 导航栏多级分类菜单（[PR #5](https://github.com/YuYisir/Initial-M/pull/5) by @NHPT）
+- **functions.php**: 新增 `NavigationCategories()` 函数，支持聚合/展开两种模式与当前分类高亮
+- **header.php**: 分类菜单输出改由函数生成，按需加载样式
+- **navigation-category-tree.css**: 新增多级分类下拉样式
+
+#### 3. 全局明暗主题切换（[PR #7](https://github.com/YuYisir/Initial-M/pull/7) by @NHPT）
+- **theme-switch.css** / **theme-switch.js**: 新增亮/暗/自动三档主题切换
+- **header.php** / **footer.php**: 引入切换组件与初始化脚本
+- **functions.php**: 添加主题切换相关配置项
+
+#### 4. 推荐文章展示（[PR #9](https://github.com/YuYisir/Initial-M/pull/9) by @NHPT）
+- **functions.php**: 新增 `InitialRelatedPosts()`，优先推荐同标签/分类文章，不足时以最新文章补齐
+- **related-posts.css**: 新增推荐文章样式
+- **post.php** / **header.php**: 文章版权声明之后输出推荐内容，按需加载样式
+
+#### 5. 样式与资源调整（by @YuYisir）
+- **navigation-category-tree.css**: 分类菜单样式恢复原版风格（半透明面板、三角箭头、二级菜单左侧滑出动画、移动端 75% 宽度）
+- **theme-switch.css**: 明暗主题颜色适配，暗色模式下文章与侧栏背景微调
+- **code-block-tools.css / code-block-tools.js / navigation-category-tree.css / related-posts.css / theme-switch.css / theme-switch.js**: PR 新增静态资源统一压缩处理
+
+> **完整对比**: [v3.4.0...v3.5.0](https://github.com/YuYisir/Initial-M/compare/v3.4.0...v3.5.0)
+
+## v3.4.1 (2026-08-30)
+
+#### 1. 新增「近期更新」Badge 功能
+- **functions.php**: 新增 `recentlyUpdatedBadge()` 公共函数 + `RecentlyUpdatedBadge` 开关 + `RecentlyUpdatedDays` 天数设置（默认15天）
+- **post.php**: 文章详情页标题右侧显示 Badge
+- **index.php**: 首页文章列表标题右侧显示 Badge
+- **archive.php**: 分类/标签/日期/搜索归档列表标题右侧显示 Badge
+- **page-archives.php**: 归档自定义模板列表标题右侧显示 Badge
+- **style.min.css**: 新增 `.recently-updated` Badge 样式
+- **判断逻辑**: 复用 `$this->modified`，仅当最后修改时间在设定天数以内、修改时间有效且不晚于当前时间时显示
+
+## v3.4.0 (2026-08-24)
+
+#### 1. 代码块语言标识与复制功能（[PR #8](https://github.com/YuYisir/Initial-M/pull/8) by @NHPT）
+- **code-block-tools.css**: 新增代码块工具样式
+- **code-block-tools.js**: 新增代码块复制按钮与语言标签功能
+- **functions.php**: 添加相关配置项
+- **header.php**: 引入代码块工具资源
+
+#### 2. 代码块经典与增强样式切换（by @YuYisir）
+- **code-block-tools.css**: 新增经典与增强两种代码块样式
+- **code-block-tools.js**: 支持样式切换逻辑
+- **functions.php**: 添加样式切换配置
+- **header.php**: 引入样式资源
+
+#### 3. 代码高亮解析与语言支持修复（[PR #14](https://github.com/YuYisir/Initial-M/pull/14) by @NHPT）
+- **footer.php**: 修复代码高亮初始化逻辑
+- **main.min.js**: 修正语言识别与高亮解析
+
+#### 4. 懒加载图片重复 src 属性修复（[PR #12](https://github.com/YuYisir/Initial-M/pull/12) by @NHPT）
+- **functions.php**: 避免懒加载图片生成重复 src 属性
+
+> **完整对比**: [v3.3.0...v3.4.0](https://github.com/YuYisir/Initial-M/compare/v3.3.0...v3.4.0)
+
+## v3.3.0 (2026-08-15)
+
+#### 1. SEO 元数据修复（[PR #1](https://github.com/YuYisir/Initial-M/pull/1) by @NHPT）
+- **header.php**: 修复分页标题、canonical 与 SEO 元数据输出，补齐 Open Graph 与 Twitter Card，使用 json_encode 安全生成 JSON-LD
+- **functions.php**: 补充 SEO 描述字段与缩略图 alt 属性
+
+#### 2. 安全问题修复（[PR #2](https://github.com/YuYisir/Initial-M/pull/2) by @NHPT）
+- **page-whisper.php**: 修复轻语 XSS、权限绕过、验证码绕过与相关安全问题
+
+#### 3. GitHub 安全审计工作流（[PR #4](https://github.com/YuYisir/Initial-M/pull/4) by @NHPT）
+- 新增 GitHub 安全审计工作流
+
+#### 4. 静态资源缓存刷新修复（[PR #10](https://github.com/YuYisir/Initial-M/pull/10) by @NHPT）
+- 修复：按文件修改时间刷新静态资源缓存
+
+> **新贡献者**: @NHPT 在 [PR #1](https://github.com/YuYisir/Initial-M/pull/1) 中首次贡献  
+> **完整对比**: [v3.2.9...v3.3.0](https://github.com/YuYisir/Initial-M/compare/v3.2.9...v3.3.0)
+
 ## v3.2.9 (2026-08-02)
 
 #### 1. 侧边栏评论链接修复

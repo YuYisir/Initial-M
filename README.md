@@ -4,7 +4,7 @@
   <img src="screenshot.png" width="50%" height="auto" alt="主题封面">
 </div>
 
-![Version](https://img.shields.io/badge/version-3.2.9-blue)
+![Version](https://img.shields.io/badge/version-3.5.0-blue)
 ![Typecho](https://img.shields.io/badge/Typecho-1.3-green)
 ![PHP](https://img.shields.io/badge/PHP-8.1+-red)
 ![License](https://img.shields.io/badge/license-MIT-brightgreen)
@@ -82,10 +82,13 @@
 
 ## 📈 当前版本更新日志
 
-**当前版本：v3.2.9 (2026-08-02)**
+**当前版本：v3.5.0 (2026-08-30)**
 
-- **sidebar.php**: 修复侧边栏最近回复中独立页面评论链接在未登录时不显示的问题，简化条件判断逻辑并添加 permalink 兜底处理
-- **main.min.js**: 修复返回顶部功能5个关键Bug，包括动画参数错误、指数衰减卡死、移动端无法打断动画、pjax切换后按钮失效、动画自取消等问题
+- 修复：回复可见内容访问控制（[PR #13](https://github.com/YuYisir/Initial-M/pull/13)）
+- 新增：导航栏多级分类菜单，样式沿用原版风格（[PR #5](https://github.com/YuYisir/Initial-M/pull/5)）
+- 新增：全局明暗主题切换，亮/暗/自动三档（[PR #7](https://github.com/YuYisir/Initial-M/pull/7)）
+- 新增：推荐文章展示，优先同标签/分类补齐最新文章（[PR #9](https://github.com/YuYisir/Initial-M/pull/9)）
+- 调整：分类菜单与主题切换样式适配，PR 新增静态资源压缩
 
 
 📄 查看完整详细历史更新请前往 [CHANGELOG.md](CHANGELOG.md)

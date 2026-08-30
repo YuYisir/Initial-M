@@ -1,8 +1,24 @@
 <?php
 if (!defined('__TYPECHO_ROOT_DIR__')) exit;
 error_reporting(0);
-define('INITIAL_VERSION_NUMBER', '3.2.9');
+define('INITIAL_VERSION_NUMBER', '3.5.0');
 if (Helper::options()->GravatarUrl) define('__TYPECHO_GRAVATAR_PREFIX__', Helper::options()->GravatarUrl);
+
+/**
+ * 返回「近期更新」Badge HTML，受后台开关与天数控制；无匹配时返回空字符串
+ */
+function recentlyUpdatedBadge($widget) {
+    static $options = null;
+    if (null === $options) $options = Helper::options();
+    if (!$options->RecentlyUpdatedBadge) return '';
+    $days = max(1, intval($options->RecentlyUpdatedDays ?? 15));
+    $modified = (int)$widget->modified;
+    $now = time();
+    if ($modified > 0 && $modified <= $now && ($now - $modified) <= $days * 86400) {
+        return '<span class="recently-updated">近期更新</span>';
+    }
+    return '';
+}
 
 function themeConfig($form) {
 	$logoUrl = new Typecho_Widget_Helper_Form_Element_Text('logoUrl', NULL, NULL, _t('站点标题 LOGO 地址'), _t('在这里填入一个图片 URL 地址, 以显示网站标题 LOGO'));
@@ -17,6 +33,13 @@ function themeConfig($form) {
 	'all' => _t('LOGO+文字')),
 	'title', _t('站点标题显示内容'), _t('默认仅显示文字标题，若要显示LOGO，请在上方添加 LOGO 地址'));
 	$form->addInput($titleForm);
+
+	$ThemeMode = new Typecho_Widget_Helper_Form_Element_Radio('ThemeMode',
+	array('auto' => _t('跟随系统'),
+	'light' => _t('浅色'),
+	'dark' => _t('深色')),
+	'auto', _t('默认配色模式'), _t('访客可在前台切换配色，手动选择会保存在当前浏览器中'));
+	$form->addInput($ThemeMode);
 
 	$subTitle = new Typecho_Widget_Helper_Form_Element_Text('subTitle', NULL, NULL, _t('自定义站点副标题'), _t('浏览器副标题，仅在当前页面为首页时显示，显示格式为：<b>标题 - 副标题</b>，留空则不显示副标题'));
 	$form->addInput($subTitle);
@@ -81,6 +104,15 @@ function themeConfig($form) {
 	$ExpireNoticeDays = new Typecho_Widget_Helper_Form_Element_Text('ExpireNoticeDays', NULL, '180', _t('文章过期提醒天数'), _t('设置文章过期提醒的天数，默认为180天，仅在启用文章过期提醒时生效'));
 	$form->addInput($ExpireNoticeDays);
 
+	$RecentlyUpdatedBadge = new Typecho_Widget_Helper_Form_Element_Radio('RecentlyUpdatedBadge',
+	array(1 => _t('启用'),
+	0 => _t('关闭')),
+	0, _t('近期更新Badge'), _t('默认关闭，启用后在文章标题右侧显示「近期更新」标识（最后修改时间≤设定天数的文章）'));
+	$form->addInput($RecentlyUpdatedBadge);
+
+	$RecentlyUpdatedDays = new Typecho_Widget_Helper_Form_Element_Text('RecentlyUpdatedDays', NULL, '15', _t('近期更新判断天数'), _t('设置文章最后修改时间多少天内显示「近期更新」标识，默认为15天，仅在启用近期更新Badge时生效'));
+	$form->addInput($RecentlyUpdatedDays);
+
 	$LicenseInfo = new Typecho_Widget_Helper_Form_Element_Text('LicenseInfo', NULL, NULL, _t('文章许可信息'), _t('填入后将在文章底部显示你填入的许可信息（支持HTML标签，输入数字"0"可关闭显示），留空则默认使用 (CC BY-SA 4.0)国际许可协议。'));
 	$form->addInput($LicenseInfo);
 
@@ -135,8 +167,14 @@ function themeConfig($form) {
 	$Highlight = new Typecho_Widget_Helper_Form_Element_Radio('Highlight', 
 	array(1 => _t('启用'),
 	0 => _t('关闭')),
-	0, _t('代码高亮'), _t('默认关闭，启用则会渲染页面内代码块”'));
+	0, _t('代码高亮'), _t('默认关闭，启用后渲染代码高亮，并显示语言和复制按钮'));
 	$form->addInput($Highlight);
+
+	$CodeBlockStyle = new Typecho_Widget_Helper_Form_Element_Radio('CodeBlockStyle',
+	array(1 => _t('增强'),
+	0 => _t('经典')),
+	1, _t('代码块样式'), _t('默认使用增强样式，可切换为经典样式'));
+	$form->addInput($CodeBlockStyle);
 
 	$LazyLoad = new Typecho_Widget_Helper_Form_Element_Radio('LazyLoad', 
 	array(1 => _t('启用'),
@@ -150,6 +188,20 @@ function themeConfig($form) {
 	0 => _t('全部关闭')),
 	'post', _t('文章目录'), _t('一键开关全部文章目录，默认使用文章内的设定，（若文章内无任何标题，则不显示目录）'));
 	$form->addInput($catalog);
+
+	$RelatedPosts = new Typecho_Widget_Helper_Form_Element_Radio('RelatedPosts',
+	array(1 => _t('启用'),
+	0 => _t('关闭')),
+	0, _t('推荐文章'), _t('默认关闭，启用后在文章版权声明之后显示推荐内容'));
+	$form->addInput($RelatedPosts);
+
+	$RelatedPostsNumber = new Typecho_Widget_Helper_Form_Element_Select('RelatedPostsNumber',
+	array(3 => _t('3 篇'),
+	4 => _t('4 篇'),
+	6 => _t('6 篇'),
+	8 => _t('8 篇')),
+	4, _t('推荐文章数量'), _t('优先推荐相同标签和分类的文章，不足时使用最新文章补齐'));
+	$form->addInput($RelatedPostsNumber);
 
 	$scrollTop = new Typecho_Widget_Helper_Form_Element_Radio('scrollTop', 
 	array(1 => _t('启用'),
@@ -313,6 +365,12 @@ function themeConfig($form) {
 	
 	if(isset($_POST['type']))
 	{ 
+	// CSRF 校验：验证 Typecho 安全 token。
+	$security = Typecho_Widget::widget('Widget_Security');
+	$expected = $security->getToken('theme-backup');
+	if (!isset($_POST['_']) || $_POST['_'] !== $expected) {
+		echo '<div class="tongzhi col-mb-12 home">安全校验失败，请刷新页面后重试。</div>';
+	} else {
 	if($_POST["type"]=="备份模板设置数据"){
 		// 创建带时间戳的备份
 		$timestamp = time();
@@ -365,8 +423,9 @@ function themeConfig($form) {
 		<script language="JavaScript">window.setTimeout("location='<?php Helper::options()->adminUrl('options-theme.php'); ?>'", 2500);</script>
 		<?php
 	}
+	}
 		}
-	
+
 	// 获取备份列表
 	$backups = $db->fetchAll(
 		$db->select()->from('table.options')
@@ -382,6 +441,7 @@ function themeConfig($form) {
 	.btn:hover { opacity: 0.8; }
 	</style>
 	<form class="protected home col-mb-12" action="?'.$name.'bf" method="post">
+		<input type="hidden" name="_" value="' . Typecho_Widget::widget('Widget_Security')->getToken('theme-backup') . '" />
 	<div>
 	<h3>主题设置备份管理</h3>
 	<div style="margin-bottom: 15px;">
@@ -418,6 +478,9 @@ function themeConfig($form) {
 
 function themeInit($archive) {
 	$options = Helper::options();
+	if ($archive->is('single') && $archive->allow('comment')) {
+		startCommentSession();
+	}
 	$options->commentsAntiSpam = false;
 	if ($options->PjaxOption || FindContents('page-whisper.php', 'commentsNum', 'd')) {
 		$options->commentsOrder = 'DESC';
@@ -439,7 +502,13 @@ function themeInit($archive) {
 
 function cjUrl($path) {
 	$options = Helper::options();
-	$ver = '?ver='.constant("INITIAL_VERSION_NUMBER");
+	$version = constant("INITIAL_VERSION_NUMBER");
+	$assetPath = __DIR__ . '/' . ltrim($path, '/');
+	$modified = is_file($assetPath) ? @filemtime($assetPath) : false;
+	if ($modified) {
+		$version .= '.' . $modified;
+	}
+	$ver = '?ver=' . rawurlencode($version);
 	if ($options->cjcdnAddress) {
 		echo rtrim($options->cjcdnAddress, '/').'/'.$path.$ver;
 	} else {
@@ -460,6 +529,7 @@ function lazyLoadImages($content) {
         // 首图片不懒加载
         if ($count == 1) return $img;
         // 后续图片懒加载
+        $img = preg_replace('/\s+src=["\'][^"\']+["\']/i', '', $img, 1);
         return str_replace('<img', '<img class="lazyload" data-src="'.$matches[2].'" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" loading="lazy"', $img);
     }, $content);
 }
@@ -489,9 +559,11 @@ function postThumb($obj) {
 	if (Helper::options()->AttUrlReplace) {
 		$thumb = UrlReplace($thumb);
 	}
+	// 缩略图使用文章标题作为替代文本，避免列表图片缺少 alt。
+	$alt = htmlspecialchars($obj->title, ENT_QUOTES, 'UTF-8');
     return Helper::options()->LazyLoad 
-        ? '<img class="lazyload" data-src="'.$thumb.'" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" loading="lazy" />'
-        : '<img src="'.$thumb.'" />';
+        ? '<img class="lazyload" data-src="'.$thumb.'" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" loading="lazy" alt="'.$alt.'" />'
+        : '<img src="'.$thumb.'" alt="'.$alt.'" />';
 }
 
 function Postviews($archive) {
@@ -580,6 +652,44 @@ function Breadcrumbs($archive) {
 	if (!empty($options->Breadcrumbs) && in_array('Pageshow', $options->Breadcrumbs)) {
 		echo '<div class="breadcrumbs">'.PHP_EOL .'<a href="'.$options->siteUrl.'">首页</a> &raquo; '.$archive->title.PHP_EOL .'</div>'.PHP_EOL;
 	}
+}
+
+function NavigationCategories($archive, $aggregate = false) {
+	$currentCategory = 0;
+	if ($archive->is('category')) {
+		$currentCategory = (int) $archive->mid;
+	} elseif ($archive->is('post')) {
+		$categories = $archive->categories;
+		if (is_array($categories) && !empty($categories)) {
+			$currentCategory = (int) $categories[0]['mid'];
+		}
+	}
+
+	ob_start();
+	$archive->widget(
+		'Widget_Metas_Category_List@navigation',
+		'current=' . $currentCategory
+	)->listCategories(array(
+		'wrapClass' => 'nav-category-tree',
+		'itemClass' => 'nav-category-item'
+	));
+	$tree = trim(ob_get_clean());
+
+	if (!$tree) {
+		return;
+	}
+
+	if ($aggregate) {
+		$title = Helper::options()->CategoryText ?: '分类';
+		echo '<li class="menu-parent nav-category-root"><a role="button" tabindex="0" aria-haspopup="true">'
+			. htmlspecialchars($title, ENT_QUOTES, 'UTF-8') . '</a>' . $tree . '</li>';
+		return;
+	}
+
+	// 展开模式下复用当前导航 ul，只移除分类树最外层的包装标签。
+	$tree = preg_replace('/^<ul\b[^>]*>/', '', $tree, 1);
+	$tree = preg_replace('/<\/ul>$/', '', $tree, 1);
+	echo $tree;
 }
 
 function createCatalog($obj) {
@@ -693,6 +803,138 @@ function Contents_Post_Random($limit = 10) {
 	}
 }
 
+function InitialRelatedPosts($archive, $limit = 4) {
+	if (!$archive->is('post') || $archive->hidden) {
+		return;
+	}
+
+	$limit = max(1, min(8, (int) $limit));
+	$db = Typecho_Db::get();
+	$options = Helper::options();
+	$posts = array();
+	$excluded = array((int) $archive->cid);
+
+	// 沿用 Typecho 核心 Related 组件的字段和过滤条件，分阶段补足推荐结果。
+	$getMetaIds = function($metas) {
+		$ids = array();
+		if (!is_array($metas)) {
+			return $ids;
+		}
+
+		foreach ($metas as $meta) {
+			if (isset($meta['mid'])) {
+				$ids[] = (int) $meta['mid'];
+			}
+		}
+
+		return array_values(array_unique(array_filter($ids)));
+	};
+
+	$fetchByMetas = function($metaIds, $count) use ($db, $options, &$excluded) {
+		if (!$metaIds || $count < 1) {
+			return array();
+		}
+
+		$metaIds = array_map('intval', $metaIds);
+		$excludedIds = array_map('intval', $excluded);
+		$select = $db->select(
+			'DISTINCT table.contents.cid',
+			'table.contents.title',
+			'table.contents.slug',
+			'table.contents.created',
+			'table.contents.authorId',
+			'table.contents.modified',
+			'table.contents.type',
+			'table.contents.status',
+			'table.contents.text',
+			'table.contents.commentsNum',
+			'table.contents.order',
+			'table.contents.template',
+			'table.contents.password',
+			'table.contents.allowComment',
+			'table.contents.allowPing',
+			'table.contents.allowFeed'
+		)->from('table.contents')
+			->join('table.relationships', 'table.contents.cid = table.relationships.cid')
+			->where('table.relationships.mid IN (' . implode(',', $metaIds) . ')')
+			->where('table.contents.cid NOT IN (' . implode(',', $excludedIds) . ')')
+			->where('table.contents.status = ?', 'publish')
+			->where('table.contents.password IS NULL')
+			->where('table.contents.created < ?', $options->time)
+			->where('table.contents.type = ?', 'post')
+			->order('table.contents.created', Typecho_Db::SORT_DESC)
+			->limit($count);
+
+		return $db->fetchAll($select);
+	};
+
+	$appendPosts = function($items) use (&$posts, &$excluded, $limit) {
+		foreach ($items as $item) {
+			$cid = isset($item['cid']) ? (int) $item['cid'] : 0;
+			if (!$cid || in_array($cid, $excluded, true)) {
+				continue;
+			}
+
+			$posts[] = $item;
+			$excluded[] = $cid;
+
+			if (count($posts) >= $limit) {
+				break;
+			}
+		}
+	};
+
+	$appendPosts($fetchByMetas(
+		$getMetaIds($archive->tags),
+		$limit - count($posts)
+	));
+	$appendPosts($fetchByMetas(
+		$getMetaIds($archive->categories),
+		$limit - count($posts)
+	));
+
+	if (count($posts) < $limit) {
+		$latest = $db->fetchAll(
+			$db->select()->from('table.contents')
+			->where('table.contents.cid NOT IN (' . implode(',', array_map('intval', $excluded)) . ')')
+			->where('table.contents.status = ?', 'publish')
+			->where('table.contents.password IS NULL')
+			->where('table.contents.created < ?', $options->time)
+			->where('table.contents.type = ?', 'post')
+			->order('table.contents.created', Typecho_Db::SORT_DESC)
+			->limit($limit - count($posts))
+		);
+		$appendPosts($latest);
+	}
+
+	if (!$posts) {
+		return;
+	}
+
+	$widget = Typecho_Widget::widget('Widget_Abstract_Contents@relatedPosts');
+	echo '<section class="related-posts" aria-labelledby="related-posts-title">' . PHP_EOL;
+	echo '<h2 id="related-posts-title" class="related-posts__title">' . _t('推荐文章') . '</h2>' . PHP_EOL;
+	echo '<ul class="related-posts__list">' . PHP_EOL;
+
+	foreach ($posts as $post) {
+		$widget->push($post);
+		$title = htmlspecialchars(
+			strip_tags(htmlspecialchars_decode($widget->title, ENT_QUOTES)),
+			ENT_QUOTES,
+			'UTF-8'
+		);
+		$permalink = htmlspecialchars($widget->permalink, ENT_QUOTES, 'UTF-8');
+		$created = (int) $post['created'];
+
+		echo '<li class="related-posts__item"><a href="' . $permalink . '">'
+			. '<span class="related-posts__name">' . $title . '</span>'
+			. '<time datetime="' . date('c', $created) . '">'
+			. date('Y-m-d', $created) . '</time></a></li>' . PHP_EOL;
+	}
+
+	echo '</ul>' . PHP_EOL . '</section>' . PHP_EOL;
+}
+
 class Initial_Widget_Comments_Recent extends Widget_Abstract_Comments
 {
 	public function __construct($request, $response, $params = NULL) {
@@ -749,6 +991,24 @@ function FindContents($val = NULL, $order = 'order', $sort = 'a', $publish = NUL
 	return empty($rows) ? NULL : $rows;
 }
 
+// 使用 Typecho 的属性白名单过滤轻语内容，避免评论中的事件属性被执行。
+function filterWhisperContent($content, $allowedTags) {
+	$allowedTags .= '<a href="" title="" target=""><img src="" alt="" title="">' . Helper::options()->commentsHTMLTagAllowed;
+	$content = Typecho_Common::stripTags($content, $allowedTags);
+	return preg_replace_callback('/\s(href|src)\s*=\s*([\'"])(.*?)\2/is', function($matches) {
+		$url = html_entity_decode($matches[3], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+		$normalized = preg_replace('/[\x00-\x20\x7f]+/', '', trim($url));
+		$scheme = parse_url($normalized, PHP_URL_SCHEME);
+		$allowed = strtolower($matches[1]) == 'href'
+			? array('http', 'https', 'mailto')
+			: array('http', 'https');
+		if ($scheme !== NULL && $scheme !== false && !in_array(strtolower($scheme), $allowed, true)) {
+			return '';
+		}
+		return $matches[0];
+	}, $content);
+}
+
 function Whisper($sidebar = NULL) {
 	$db = Typecho_Db::get();
 	$options = Helper::options();
@@ -781,7 +1041,7 @@ function Whisper($sidebar = NULL) {
 			if ($options->AttUrlReplace) {
 				$content = UrlReplace($content);
 			}
-			$content = strip_tags($content, '<p><br><strong><a><img><pre><code>'.$options->commentsHTMLTagAllowed) . ($sidebar ? PHP_EOL .'<li class="more"><a href="'.$widget->permalink.'">查看更多...</a></li>' : '');
+			$content = filterWhisperContent($content, '<p><br><strong><pre><code>') . ($sidebar ? PHP_EOL .'<li class="more"><a href="'.$widget->permalink.'">查看更多...</a></li>' : '');
 		} else {
 			$content = '<'.$p.'>暂无内容</'.$p.'>';
 		}
@@ -890,6 +1150,11 @@ function compressHtml($html_source) {
 }
 
 function themeFields($layout) {
+	// 可选的文章级 SEO 描述，留空时自动使用正文摘要。
+	$description = new Typecho_Widget_Helper_Form_Element_Textarea('description', NULL, NULL, _t('SEO 描述'), _t('用于搜索结果和社交分享，建议控制在 80～160 个字符；留空则自动使用正文摘要'));
+	$description->input->setAttribute('class', 'w-100');
+	$layout->addItem($description);
+
 	$thumb = new Typecho_Widget_Helper_Form_Element_Text('thumb', NULL, NULL, _t('自定义缩略图'), _t('在这里填入一个图片 URL 地址, 以添加本文的缩略图，若填入纯数字，例如 <b>3</b> ，则使用文章第三张图片作为缩略图（对应位置无图则不显示缩略图），留空则默认不显示缩略图'));
 	$thumb->input->setAttribute('class', 'w-100');
 	$layout->addItem($thumb);
@@ -901,26 +1166,140 @@ function themeFields($layout) {
 	$layout->addItem($catalog);
 }
 /*回复可见样式开始*/
-Typecho_Plugin::factory('Widget_Abstract_Contents')->excerptEx = array('myyodux','one');
-Typecho_Plugin::factory('Widget_Abstract_Contents')->contentEx = array('myyodux','one');
-class myyodux {
-    public static function one($con,$obj,$text)
-    {
-      $text = empty($text)?$con:$text;
-      if(!$obj->is('single')){
-      $text = preg_replace_callback('/(```[\s\S]*?```|`[^`]+`|<code[\s\S]*?<\/code>|<pre[\s\S]*?<\/pre>)/', function($matches) {
-          return str_replace(array('[hidden]', '[/hidden]'), array('&#91;hidden&#93;', '&#91;/hidden&#93;'), $matches[0]);
-      }, $text);
-      $text = preg_replace("/\[hidden\](.*?)\[\/hidden\]/sm",'',$text);
-      }return $text;
-}
+Typecho_Plugin::factory('Widget_Abstract_Contents')->excerptEx = array('InitialHiddenContent', 'filterExcerpt');
+Typecho_Plugin::factory('Widget_Abstract_Contents')->contentEx = array('InitialHiddenContent', 'filterContent');
+Typecho_Plugin::factory('Widget_Feedback')->finishComment = array('InitialHiddenContent', 'grantAfterComment');
+class InitialHiddenContent {
+	const COOKIE_PREFIX = 'initial_hidden_';
+	const COOKIE_LIFETIME = 2592000;
+
+	private static function protectCode($text) {
+		return preg_replace_callback('/(```[\s\S]*?```|`[^`]+`|<code[\s\S]*?<\/code>|<pre[\s\S]*?<\/pre>)/', function($matches) {
+			return str_replace(
+				array('[hidden]', '[/hidden]'),
+				array('&#91;hidden&#93;', '&#91;/hidden&#93;'),
+				$matches[0]
+			);
+		}, $text);
+	}
+
+	private static function replace($text, $visible, $showPlaceholder = false) {
+		$text = self::protectCode($text);
+		$text = preg_replace_callback('/\[hidden\](.*?)(?:\[\/hidden\]|$)/is', function($matches) use ($visible, $showPlaceholder) {
+			if ($visible) {
+				return '<div class="reply2view">'.$matches[1].'</div>';
+			}
+			return $showPlaceholder
+				? '<div class="reply2view">此处内容需要评论回复后方可阅读</div>'
+				: '';
+		}, $text);
+		return str_replace('[/hidden]', '', $text);
+	}
+
+	private static function cookieName($cid) {
+		return self::COOKIE_PREFIX.(int) $cid;
+	}
+
+	private static function signature($cid, $coid, $expires) {
+		return hash_hmac(
+			'sha256',
+			(int) $cid.'|'.(int) $coid.'|'.(int) $expires,
+			(string) Helper::options()->secret
+		);
+	}
+
+	public static function filterExcerpt($con, $obj, $text) {
+		return self::replace(empty($text) ? $con : $text, false);
+	}
+
+	public static function filterContent($con, $obj, $text) {
+		$text = empty($text) ? $con : $text;
+		return $obj->is('single')
+			? self::render($text, $obj->cid)
+			: self::replace($text, false);
+	}
+
+	public static function strip($text) {
+		return self::replace($text, false);
+	}
+
+	public static function canView($cid) {
+		if (Typecho_Widget::widget('Widget_User')->hasLogin()) {
+			return true;
+		}
+
+		$value = Typecho_Cookie::get(self::cookieName($cid));
+		if (!$value || substr_count($value, '.') !== 2) {
+			return false;
+		}
+
+		list($coid, $expires, $signature) = explode('.', $value, 3);
+		if (!ctype_digit($coid) || !ctype_digit($expires) || (int) $expires < time()) {
+			return false;
+		}
+
+		if (!hash_equals(self::signature($cid, $coid, $expires), $signature)) {
+			return false;
+		}
+
+		$db = Typecho_Db::get();
+		return (bool) $db->fetchRow(
+			$db->select('coid')->from('table.comments')
+				->where('coid = ? AND cid = ?', (int) $coid, (int) $cid)
+				->where('type = ? AND status = ?', 'comment', 'approved')
+				->limit(1)
+		);
+	}
+
+	public static function render($text, $cid) {
+		return self::replace($text, self::canView($cid), true);
+	}
+
+	public static function grantAfterComment($feedback) {
+		if ($feedback->type !== 'comment') {
+			return;
+		}
+
+		$expires = time() + self::COOKIE_LIFETIME;
+		$value = (int) $feedback->coid.'.'.$expires.'.'.self::signature(
+			$feedback->cid,
+			$feedback->coid,
+			$expires
+		);
+		Typecho_Cookie::set(self::cookieName($feedback->cid), $value, $expires);
+	}
 }/*回复可见样式结束*/
 /* 增加评论验证*/
-function spam_protection_math() {
+function startCommentSession() {
+	if (session_status() === PHP_SESSION_NONE) {
+		@session_start();
+	}
+	return session_status() === PHP_SESSION_ACTIVE;
+}
+
+function spam_protection_math($cid = 0) {
+	if (!startCommentSession()) {
+		echo '<p class="notice">验证码暂时不可用，请刷新页面后重试。</p>';
+		return;
+	}
     $num1 = rand(1, 15);$num2 = rand(1, 15);
+	$captchaId = bin2hex(random_bytes(16));
+	$now = time();
+	if (!isset($_SESSION['initial_math_challenges']) || !is_array($_SESSION['initial_math_challenges'])) {
+		$_SESSION['initial_math_challenges'] = array();
+	}
+	foreach ($_SESSION['initial_math_challenges'] as $key => $challenge) {
+		if (empty($challenge['expires']) || $challenge['expires'] < $now) {
+			unset($_SESSION['initial_math_challenges'][$key]);
+		}
+	}
+	$_SESSION['initial_math_challenges'][$captchaId] = array(
+		'answer' => $num1 + $num2,
+		'cid' => (int) $cid,
+		'expires' => $now + 600
+	);
     echo "<div style=\"display:flex;flex-direction: column;align-items: flex-start;\"><p for=\"math\" id=\"Verification_code\" style=\"margin:0\"><code>$num1</code>+<code>$num2</code> 等于：</p><input type=\"text\" name=\"sum\" class=\"text\" value=\"\" size=\"25\" id=\"sum\" tabindex=\"4\" style=\"flex:1\" placeholder=\"计算结果 *\">\n</div>";
-    echo "<input type=\"hidden\" name=\"num1\" value=\"$num1\">\n";
-    echo "<input type=\"hidden\" name=\"num2\" value=\"$num2\">";
+    echo "<input type=\"hidden\" name=\"captchaId\" value=\"$captchaId\">";
 }
 /* 增加评论验证结束*/
 // 注册评论验证码验证
@@ -929,17 +1308,35 @@ Typecho_Plugin::factory('Widget_Feedback')->trackback = array('CommentProtection
 Typecho_Plugin::factory('Widget_Feedback')->pingback = array('CommentProtection', 'verify');
 class CommentProtection {
     public static function verify($comment, $post, $result) {
+		// 轻语页面的顶级内容必须由 editor 在服务端授权。
+		if ($post->template === 'page-whisper.php'
+			&& empty($comment['parent'])
+			&& !Typecho_Widget::widget('Widget_User')->pass('editor', true)) {
+			throw new Typecho_Widget_Exception(_t('只有编辑可以发布轻语.', '评论失败'));
+		}
         if ($_REQUEST['text'] != null) {
-            if($_POST['num1'] == null || $_POST['num2'] == null) {
-                throw new Typecho_Widget_Exception(_t('验证码异常.', '评论失败'));
-            } else {
-                $sum = $_POST['sum'];
-                if ($sum == null) {
-                    throw new Typecho_Widget_Exception(_t('请输入验证码.', '评论失败'));
-                } elseif ($sum != ($_POST['num1'] + $_POST['num2'])) {
-                    throw new Typecho_Widget_Exception(_t('验证码错误.', '评论失败'));
-                }
-            }
+			if (!startCommentSession()) {
+				throw new Typecho_Widget_Exception(_t('验证码异常.', '评论失败'));
+			}
+			$captchaId = isset($_POST['captchaId']) ? $_POST['captchaId'] : '';
+			$sum = isset($_POST['sum']) ? $_POST['sum'] : '';
+			$challenge = isset($_SESSION['initial_math_challenges'][$captchaId])
+				? $_SESSION['initial_math_challenges'][$captchaId]
+				: NULL;
+			if (!$challenge || $challenge['expires'] < time()) {
+				unset($_SESSION['initial_math_challenges'][$captchaId]);
+				throw new Typecho_Widget_Exception(_t('验证码已过期，请刷新页面后重试.', '评论失败'));
+			}
+			unset($_SESSION['initial_math_challenges'][$captchaId]);
+			if ((int) $post->cid !== (int) $challenge['cid']) {
+				throw new Typecho_Widget_Exception(_t('验证码异常.', '评论失败'));
+			}
+			if ($sum === '') {
+				throw new Typecho_Widget_Exception(_t('请输入验证码.', '评论失败'));
+			}
+			if (!ctype_digit((string) $sum) || (int) $sum !== (int) $challenge['answer']) {
+				throw new Typecho_Widget_Exception(_t('验证码错误.', '评论失败'));
+			}
         }return $comment;
     }
 }
