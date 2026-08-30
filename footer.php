@@ -59,6 +59,7 @@ if ($page_links):
 <?php if ($this->options->Highlight): ?>
 <script src="<?php cjUrl('code-block-tools.js') ?>"></script>
 <?php endif; ?>
+<script src="<?php cjUrl('theme-switch.js') ?>"></script>
 <?php $this->footer(); ?>
 <?php if ($this->options->CustomContent): $this->options->CustomContent(); ?>
 <?php endif; ?>

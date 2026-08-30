@@ -1,10 +1,63 @@
-<?php if (!defined('__TYPECHO_ROOT_DIR__')) exit; ?>
+<?php
+if (!defined('__TYPECHO_ROOT_DIR__')) exit;
+$defaultThemeMode = $this->options->ThemeMode;
+if (!in_array($defaultThemeMode, array('auto', 'light', 'dark'), true)) {
+    $defaultThemeMode = 'auto';
+}
+$initialThemeScheme = $defaultThemeMode === 'dark' ? 'dark' : 'light';
+$themeModeLabels = array(
+    'auto' => '跟随系统',
+    'light' => '浅色',
+    'dark' => '深色'
+);
+?>
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html
+    lang="zh-CN"
+    class="theme-<?php echo $initialThemeScheme; ?>"
+    data-theme="<?php echo $defaultThemeMode; ?>"
+    data-theme-default="<?php echo $defaultThemeMode; ?>"
+    data-color-scheme="<?php echo $initialThemeScheme; ?>"
+>
 <head>
 <meta charset="<?php $this->options->charset(); ?>" />
 <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="color-scheme" content="light dark" />
+<meta
+    id="theme-color-meta"
+    name="theme-color"
+    content="<?php echo $initialThemeScheme === 'dark' ? '#111315' : '#ffffff'; ?>"
+/>
+<script>
+(function () {
+    var root = document.documentElement;
+    var theme = root.getAttribute('data-theme-default') || 'auto';
+
+    try {
+        theme = localStorage.getItem('initial-theme') || theme;
+    } catch (error) {}
+
+    if (['auto', 'light', 'dark'].indexOf(theme) === -1) {
+        theme = 'auto';
+    }
+
+    var scheme = theme === 'auto'
+        ? (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+        : theme;
+    var themeColor = document.getElementById('theme-color-meta');
+
+    root.setAttribute('data-theme', theme);
+    root.setAttribute('data-color-scheme', scheme);
+    root.classList.remove('theme-light', 'theme-dark');
+    root.classList.add('theme-' + scheme);
+    root.style.colorScheme = scheme;
+
+    if (themeColor) {
+        themeColor.setAttribute('content', scheme === 'dark' ? '#111315' : '#ffffff');
+    }
+})();
+</script>
 <?php if ($this->options->favicon): ?>
 <link rel="shortcut icon" href="<?php $this->options->favicon(); ?>" />
 <?php endif;
@@ -131,6 +184,7 @@ window.codeBlockStyle = <?php echo (int)($this->options->CodeBlockStyle ?? 1); ?
 <?php if (!empty($this->options->Navset) && in_array('ShowCategory', $this->options->Navset)): ?>
 <link rel="stylesheet" href="<?php cjUrl('navigation-category-tree.css') ?>" />
 <?php endif; ?>
+<link rel="stylesheet" href="<?php cjUrl('theme-switch.css') ?>" />
 <?php if ($this->options->CustomCSS): ?>
 <style type="text/css"><?php $this->options->CustomCSS(); ?></style>
 <?php endif; ?>
@@ -149,6 +203,54 @@ window.codeBlockStyle = <?php echo (int)($this->options->CodeBlockStyle ?? 1); ?
 </div>
 <script>function Navswith(){document.getElementById("header").classList.toggle("on")}</script>
 <button id="nav-swith" onclick="Navswith()" aria-label="切换导航菜单"><span></span></button>
+<div class="theme-switcher">
+<button
+    id="theme-switcher-toggle"
+    class="theme-switcher__toggle"
+    type="button"
+    aria-label="配色模式：<?php echo $themeModeLabels[$defaultThemeMode]; ?>"
+    aria-haspopup="true"
+    aria-expanded="false"
+    aria-controls="theme-switcher-menu"
+    title="配色模式：<?php echo $themeModeLabels[$defaultThemeMode]; ?>"
+>
+<svg class="theme-switcher__icon theme-switcher__icon--light" aria-hidden="true" focusable="false" viewBox="0 0 24 24">
+<circle cx="12" cy="12" r="4"></circle>
+<path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.42"></path>
+</svg>
+<svg class="theme-switcher__icon theme-switcher__icon--dark" aria-hidden="true" focusable="false" viewBox="0 0 24 24">
+<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
+</svg>
+<svg class="theme-switcher__icon theme-switcher__icon--auto" aria-hidden="true" focusable="false" viewBox="0 0 24 24">
+<rect width="20" height="14" x="2" y="3" rx="2"></rect>
+<line x1="8" x2="16" y1="21" y2="21"></line>
+<line x1="12" x2="12" y1="17" y2="21"></line>
+</svg>
+</button>
+<div id="theme-switcher-menu" class="theme-switcher__menu" role="menu" aria-label="配色模式" hidden>
+<button class="theme-switcher__option" type="button" role="menuitemradio" aria-checked="<?php echo $defaultThemeMode === 'light' ? 'true' : 'false'; ?>" data-theme-value="light">
+<svg aria-hidden="true" focusable="false" viewBox="0 0 24 24">
+<circle cx="12" cy="12" r="4"></circle>
+<path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.42"></path>
+</svg>
+<span>浅色</span>
+</button>
+<button class="theme-switcher__option" type="button" role="menuitemradio" aria-checked="<?php echo $defaultThemeMode === 'dark' ? 'true' : 'false'; ?>" data-theme-value="dark">
+<svg aria-hidden="true" focusable="false" viewBox="0 0 24 24">
+<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
+</svg>
+<span>深色</span>
+</button>
+<button class="theme-switcher__option" type="button" role="menuitemradio" aria-checked="<?php echo $defaultThemeMode === 'auto' ? 'true' : 'false'; ?>" data-theme-value="auto">
+<svg aria-hidden="true" focusable="false" viewBox="0 0 24 24">
+<rect width="20" height="14" x="2" y="3" rx="2"></rect>
+<line x1="8" x2="16" y1="21" y2="21"></line>
+<line x1="12" x2="12" y1="17" y2="21"></line>
+</svg>
+<span>跟随系统</span>
+</button>
+</div>
+</div>
 <nav id="nav">
 <div id="site-search">
 <form id="search" method="post" action="<?php $this->options->siteUrl(); ?>">
