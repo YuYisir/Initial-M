@@ -633,6 +633,44 @@ function Breadcrumbs($archive) {
 	}
 }
 
+function NavigationCategories($archive, $aggregate = false) {
+	$currentCategory = 0;
+	if ($archive->is('category')) {
+		$currentCategory = (int) $archive->mid;
+	} elseif ($archive->is('post')) {
+		$categories = $archive->categories;
+		if (is_array($categories) && !empty($categories)) {
+			$currentCategory = (int) $categories[0]['mid'];
+		}
+	}
+
+	ob_start();
+	$archive->widget(
+		'Widget_Metas_Category_List@navigation',
+		'current=' . $currentCategory
+	)->listCategories(array(
+		'wrapClass' => 'nav-category-tree',
+		'itemClass' => 'nav-category-item'
+	));
+	$tree = trim(ob_get_clean());
+
+	if (!$tree) {
+		return;
+	}
+
+	if ($aggregate) {
+		$title = Helper::options()->CategoryText ?: '分类';
+		echo '<li class="menu-parent nav-category-root"><a role="button" tabindex="0" aria-haspopup="true">'
+			. htmlspecialchars($title, ENT_QUOTES, 'UTF-8') . '</a>' . $tree . '</li>';
+		return;
+	}
+
+	// 展开模式下复用当前导航 ul，只移除分类树最外层的包装标签。
+	$tree = preg_replace('/^<ul\b[^>]*>/', '', $tree, 1);
+	$tree = preg_replace('/<\/ul>$/', '', $tree, 1);
+	echo $tree;
+}
+
 function createCatalog($obj) {
 	global $catalog;
 	global $catalog_count;
