@@ -43,7 +43,7 @@ $desc = mb_substr(trim($desc), 0, 160, 'UTF-8');
 if ($this->is('post') || $this->is('page')) {
     if (!empty($this->fields->thumb) && !is_numeric($this->fields->thumb)) {
         $cover = $this->fields->thumb;
-    } elseif (!$this->hidden && $options->autoFetchCover && preg_match('/<img[^>]+src=["\']([^"\']+)["\']/i', $this->content, $matches)) {
+    } elseif (!$this->hidden && $options->autoFetchCover && preg_match('/<img[^>]+src=["\']([^"\']+)["\']/i', InitialHiddenContent::strip($this->content), $matches)) {
         $cover = $matches[1];
     } else {
         $cover = $options->defaultCover ?: $options->themeUrl . '/img/default-cover.webp';
