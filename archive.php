@@ -10,7 +10,7 @@ $this->need('header.php'); ?>
 <?php if ($this->have()): ?>
 <?php while($this->next()): ?>
 <article class="post<?php if ($this->options->PjaxOption && $this->hidden): ?> protected<?php endif; ?>">
-<h2 class="post-title"><a href="<?php $this->permalink() ?>" title="<?php $this->title() ?>"><?php $this->title() ?></a></h2>
+<h2 class="post-title"><a href="<?php $this->permalink() ?>" title="<?php $this->title() ?>"><?php $this->title() ?></a><?php echo recentlyUpdatedBadge($this); ?></h2>
 <ul class="post-meta">
 <li><?php $this->date(); ?></li>
 <li><?php $this->category(',', false); ?></li>

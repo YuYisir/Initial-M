@@ -1,8 +1,24 @@
 <?php
 if (!defined('__TYPECHO_ROOT_DIR__')) exit;
 error_reporting(0);
-define('INITIAL_VERSION_NUMBER', '3.4.0');
+define('INITIAL_VERSION_NUMBER', '3.4.1');
 if (Helper::options()->GravatarUrl) define('__TYPECHO_GRAVATAR_PREFIX__', Helper::options()->GravatarUrl);
+
+/**
+ * 返回「近期更新」Badge HTML，受后台开关与天数控制；无匹配时返回空字符串
+ */
+function recentlyUpdatedBadge($widget) {
+    static $options = null;
+    if (null === $options) $options = Helper::options();
+    if (!$options->RecentlyUpdatedBadge) return '';
+    $days = max(1, intval($options->RecentlyUpdatedDays ?? 15));
+    $modified = (int)$widget->modified;
+    $now = time();
+    if ($modified > 0 && $modified <= $now && ($now - $modified) <= $days * 86400) {
+        return '<span class="recently-updated">近期更新</span>';
+    }
+    return '';
+}
 
 function themeConfig($form) {
 	$logoUrl = new Typecho_Widget_Helper_Form_Element_Text('logoUrl', NULL, NULL, _t('站点标题 LOGO 地址'), _t('在这里填入一个图片 URL 地址, 以显示网站标题 LOGO'));
@@ -80,6 +96,15 @@ function themeConfig($form) {
 
 	$ExpireNoticeDays = new Typecho_Widget_Helper_Form_Element_Text('ExpireNoticeDays', NULL, '180', _t('文章过期提醒天数'), _t('设置文章过期提醒的天数，默认为180天，仅在启用文章过期提醒时生效'));
 	$form->addInput($ExpireNoticeDays);
+
+	$RecentlyUpdatedBadge = new Typecho_Widget_Helper_Form_Element_Radio('RecentlyUpdatedBadge',
+	array(1 => _t('启用'),
+	0 => _t('关闭')),
+	0, _t('近期更新Badge'), _t('默认关闭，启用后在文章标题右侧显示「近期更新」标识（最后修改时间≤设定天数的文章）'));
+	$form->addInput($RecentlyUpdatedBadge);
+
+	$RecentlyUpdatedDays = new Typecho_Widget_Helper_Form_Element_Text('RecentlyUpdatedDays', NULL, '15', _t('近期更新判断天数'), _t('设置文章最后修改时间多少天内显示「近期更新」标识，默认为15天，仅在启用近期更新Badge时生效'));
+	$form->addInput($RecentlyUpdatedDays);
 
 	$LicenseInfo = new Typecho_Widget_Helper_Form_Element_Text('LicenseInfo', NULL, NULL, _t('文章许可信息'), _t('填入后将在文章底部显示你填入的许可信息（支持HTML标签，输入数字"0"可关闭显示），留空则默认使用 (CC BY-SA 4.0)国际许可协议。'));
 	$form->addInput($LicenseInfo);

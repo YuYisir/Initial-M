@@ -1,5 +1,16 @@
 # Initial-M主题更新日志
 
+## v3.4.1 (2026-08-30)
+
+#### 1. 新增「近期更新」Badge 功能
+- **functions.php**: 新增 `recentlyUpdatedBadge()` 公共函数 + `RecentlyUpdatedBadge` 开关 + `RecentlyUpdatedDays` 天数设置（默认15天）
+- **post.php**: 文章详情页标题右侧显示 Badge
+- **index.php**: 首页文章列表标题右侧显示 Badge
+- **archive.php**: 分类/标签/日期/搜索归档列表标题右侧显示 Badge
+- **page-archives.php**: 归档自定义模板列表标题右侧显示 Badge
+- **style.min.css**: 新增 `.recently-updated` Badge 样式
+- **判断逻辑**: 复用 `$this->modified`，仅当最后修改时间在设定天数以内、修改时间有效且不晚于当前时间时显示
+
 ## v3.4.0 (2026-08-24)
 
 #### 1. 代码块语言标识与复制功能（[PR #8](https://github.com/YuYisir/Initial-M/pull/8) by @NHPT）

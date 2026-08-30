@@ -4,7 +4,7 @@
   <img src="screenshot.png" width="50%" height="auto" alt="主题封面">
 </div>
 
-![Version](https://img.shields.io/badge/version-3.4.0-blue)
+![Version](https://img.shields.io/badge/version-3.4.1-blue)
 ![Typecho](https://img.shields.io/badge/Typecho-1.3-green)
 ![PHP](https://img.shields.io/badge/PHP-8.1+-red)
 ![License](https://img.shields.io/badge/license-MIT-brightgreen)
@@ -82,12 +82,9 @@
 
 ## 📈 当前版本更新日志
 
-**当前版本：v3.4.0 (2026-08-24)**
+**当前版本：v3.4.1 (2026-08-30)**
 
-- 新增：代码块语言标识与复制功能（PR #8）
-- 新增：代码块经典与增强样式切换
-- 修复：代码高亮解析与语言支持（PR #14）
-- 修复：懒加载图片生成重复 src 属性（PR #12）
+- 新增：「近期更新」Badge，文章/列表/归档页标题右侧显示（后台开关+天数可设置，默认15天）
 
 
 📄 查看完整详细历史更新请前往 [CHANGELOG.md](CHANGELOG.md)

@@ -5,7 +5,7 @@
  * 
  * @package Initial-M
  * @author YuYisir
- * @version 3.4.0
+ * @version 3.4.1
  * @link https://www.886a.top/
  */
 if (!defined('__TYPECHO_ROOT_DIR__')) exit;
@@ -17,7 +17,7 @@ if ($this->_currentPage == 1 && !empty($this->options->ShowWhisper) && in_array(
 <?php endif; ?>
 <?php while($this->next()): ?>
 <article class="post<?php if ($this->options->PjaxOption && $this->hidden): ?> protected<?php endif; ?>">
-<h2 class="post-title"><a href="<?php $this->permalink() ?>"><?php $this->title() ?></a></h2>
+<h2 class="post-title"><a href="<?php $this->permalink() ?>"><?php $this->title() ?></a><?php echo recentlyUpdatedBadge($this); ?></h2>
 <ul class="post-meta">
 <li><?php $this->date(); ?></li>
 <li><?php $this->category(',', false); ?></li>

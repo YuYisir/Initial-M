@@ -45,7 +45,7 @@ if (isset($this->categories) && count($this->categories) > 0) {
 <meta itemprop="name" content="<?php $this->author(); ?>" />
 <meta itemprop="url" content="<?php $this->author->permalink(); ?>" />
 </div>
-<h1 class="post-title" itemprop="headline"><a href="<?php $this->permalink() ?>" itemprop="url"><?php $this->title() ?></a></h1>
+<h1 class="post-title" itemprop="headline"><a href="<?php $this->permalink() ?>" itemprop="url"><?php $this->title() ?></a><?php echo recentlyUpdatedBadge($this); ?></h1>
 <ul class="post-meta">
 <li itemprop="datePublished" content="<?php $this->date('c'); ?>"><?php $this->date(); ?></li>
 <li><?php $this->category(','); ?></li>
