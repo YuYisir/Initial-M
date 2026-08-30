@@ -1,5 +1,33 @@
 # Initial-M主题更新日志
 
+## v3.5.0 (2026-08-30)
+
+#### 1. 回复可见内容访问控制修复（[PR #13](https://github.com/YuYisir/Initial-M/pull/13) by @NHPT）
+- **functions.php**: 重构回复可见内容的访问控制逻辑，修复权限校验漏洞
+- **header.php** / **post.php**: 配合调整内容输出结构
+
+#### 2. 导航栏多级分类菜单（[PR #5](https://github.com/YuYisir/Initial-M/pull/5) by @NHPT）
+- **functions.php**: 新增 `NavigationCategories()` 函数，支持聚合/展开两种模式与当前分类高亮
+- **header.php**: 分类菜单输出改由函数生成，按需加载样式
+- **navigation-category-tree.css**: 新增多级分类下拉样式
+
+#### 3. 全局明暗主题切换（[PR #7](https://github.com/YuYisir/Initial-M/pull/7) by @NHPT）
+- **theme-switch.css** / **theme-switch.js**: 新增亮/暗/自动三档主题切换
+- **header.php** / **footer.php**: 引入切换组件与初始化脚本
+- **functions.php**: 添加主题切换相关配置项
+
+#### 4. 推荐文章展示（[PR #9](https://github.com/YuYisir/Initial-M/pull/9) by @NHPT）
+- **functions.php**: 新增 `InitialRelatedPosts()`，优先推荐同标签/分类文章，不足时以最新文章补齐
+- **related-posts.css**: 新增推荐文章样式
+- **post.php** / **header.php**: 文章版权声明之后输出推荐内容，按需加载样式
+
+#### 5. 样式与资源调整（by @YuYisir）
+- **navigation-category-tree.css**: 分类菜单样式恢复原版风格（半透明面板、三角箭头、二级菜单左侧滑出动画、移动端 75% 宽度）
+- **theme-switch.css**: 明暗主题颜色适配，暗色模式下文章与侧栏背景微调
+- **code-block-tools.css / code-block-tools.js / navigation-category-tree.css / related-posts.css / theme-switch.css / theme-switch.js**: PR 新增静态资源统一压缩处理
+
+> **完整对比**: [v3.4.0...v3.5.0](https://github.com/YuYisir/Initial-M/compare/v3.4.0...v3.5.0)
+
 ## v3.4.1 (2026-08-30)
 
 #### 1. 新增「近期更新」Badge 功能
