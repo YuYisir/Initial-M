@@ -22,10 +22,11 @@ while($archives->next()){
 		$year = $year_tmp;
 		$output .= '<h3>'.date('Y 年',$archives->created).'</h3><ul>';
 	}
+	$badge = recentlyUpdatedBadge($archives);
 	if ($this->options->PjaxOption && $archives->hidden) {
-		$output .= '<li>'.date('m/d：',$archives->created).'<a>'. $archives->title .'</a></li>';
+		$output .= '<li>'.date('m/d：',$archives->created).'<a>'. $archives->title .'</a>'.$badge.'</li>';
 	} else {
-		$output .= '<li>'.date('m/d：',$archives->created).'<a href="'.$archives->permalink .'">'. $archives->title .'</a></li>';
+		$output .= '<li>'.date('m/d：',$archives->created).'<a href="'.$archives->permalink .'">'. $archives->title .'</a>'.$badge.'</li>';
 	}
 }
 $output .= '</ul></div>';

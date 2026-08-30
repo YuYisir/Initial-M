@@ -1,100 +1,193 @@
-<?php if (!defined('__TYPECHO_ROOT_DIR__')) exit; ?>
+<?php
+if (!defined('__TYPECHO_ROOT_DIR__')) exit;
+$defaultThemeMode = $this->options->ThemeMode;
+if (!in_array($defaultThemeMode, array('auto', 'light', 'dark'), true)) {
+    $defaultThemeMode = 'auto';
+}
+$initialThemeScheme = $defaultThemeMode === 'dark' ? 'dark' : 'light';
+$themeModeLabels = array(
+    'auto' => '跟随系统',
+    'light' => '浅色',
+    'dark' => '深色'
+);
+?>
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html
+    lang="zh-CN"
+    class="theme-<?php echo $initialThemeScheme; ?>"
+    data-theme="<?php echo $defaultThemeMode; ?>"
+    data-theme-default="<?php echo $defaultThemeMode; ?>"
+    data-color-scheme="<?php echo $initialThemeScheme; ?>"
+>
 <head>
 <meta charset="<?php $this->options->charset(); ?>" />
 <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="color-scheme" content="light dark" />
+<meta
+    id="theme-color-meta"
+    name="theme-color"
+    content="<?php echo $initialThemeScheme === 'dark' ? '#111315' : '#ffffff'; ?>"
+/>
+<script>
+(function () {
+    var root = document.documentElement;
+    var theme = root.getAttribute('data-theme-default') || 'auto';
+
+    try {
+        theme = localStorage.getItem('initial-theme') || theme;
+    } catch (error) {}
+
+    if (['auto', 'light', 'dark'].indexOf(theme) === -1) {
+        theme = 'auto';
+    }
+
+    var scheme = theme === 'auto'
+        ? (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+        : theme;
+    var themeColor = document.getElementById('theme-color-meta');
+
+    root.setAttribute('data-theme', theme);
+    root.setAttribute('data-color-scheme', scheme);
+    root.classList.remove('theme-light', 'theme-dark');
+    root.classList.add('theme-' + scheme);
+    root.style.colorScheme = scheme;
+
+    if (themeColor) {
+        themeColor.setAttribute('content', scheme === 'dark' ? '#111315' : '#ffffff');
+    }
+})();
+</script>
 <?php if ($this->options->favicon): ?>
 <link rel="shortcut icon" href="<?php $this->options->favicon(); ?>" />
-<?php endif; ?>
-<title><?php $this->archiveTitle(array(
+<?php endif;
+$options = Helper::options();
+$currentPage = max(1, (int) $this->_currentPage);
+$is404 = $this->is('archive', 404);
+
+// 统一生成页面标题，分页必须包含页码，避免与第一页重复。
+ob_start();
+$this->archiveTitle(array(
 'category'  =>  _t('分类 %s 下的文章'),
 'search'    =>  _t('包含关键字 %s 的文章'),
 'tag'       =>  _t('标签 %s 下的文章'),
 'date'      =>  _t('在 %s 发布的文章'),
 'author'    =>  _t('作者 %s 发布的文章')
-), '', ' - '); ?><?php $this->options->title(); if ($this->is('index') && $this->options->subTitle): ?> - <?php $this->options->subTitle(); endif; ?></title>
-<meta name="author" content="<?php $this->author(); ?>" />
-<!-- Robots Meta Tag -->
-<meta name="robots" content="index, follow" />
-<?php
-/** 1. 统一描述 (Description) 获取与清洗逻辑 */
-$desc = '';
-if ($this->is('post') || $this->is('page')) {
-    // 优先从自定义字段 description 读取，否则取摘要
-    $desc = !empty($this->fields->description) ? $this->fields->description : $this->excerpt;
-} else {
-    $desc = $this->options->description;
+), '', ' - ');
+$pageTitle = ob_get_clean() . $options->title;
+if ($currentPage > 1) {
+    $pageTitle .= ' - ' . _t('第 %d 页', $currentPage);
+} elseif ($this->is('index') && $options->subTitle) {
+    $pageTitle .= ' - ' . $options->subTitle;
 }
-// 清洗数据：去掉 HTML 标签、换行符、多余空格，并转义双引号防止 JSON 报错
-$desc = str_replace(["\r", "\n", "\t", '"'], ' ', strip_tags($desc));
-$desc = mb_substr(trim($desc), 0, 150, 'utf-8'); // 限制 150 字以内
-/** * 2. 统一封面图 (Image) 获取逻辑 */
-$cover = '';
+
+// 密码保护文章只公开标题，不从受保护正文提取摘要。
 if ($this->is('post') || $this->is('page')) {
-    if (!empty($this->fields->thumb)) {
+    $desc = !empty($this->fields->description)
+        ? $this->fields->description
+        : ($this->hidden ? $this->title : $this->excerpt);
+} else {
+    $desc = $options->description;
+}
+$desc = preg_replace('/\s+/u', ' ', strip_tags($desc));
+$desc = mb_substr(trim($desc), 0, 160, 'UTF-8');
+
+// 密码保护文章不从正文提取社交封面。
+if ($this->is('post') || $this->is('page')) {
+    if (!empty($this->fields->thumb) && !is_numeric($this->fields->thumb)) {
         $cover = $this->fields->thumb;
-    } elseif ($this->options->autoFetchCover && preg_match('/<img.*?src="(.*?)"/', $this->content, $matches)) {
+    } elseif (!$this->hidden && $options->autoFetchCover && preg_match('/<img[^>]+src=["\']([^"\']+)["\']/i', InitialHiddenContent::strip($this->content), $matches)) {
         $cover = $matches[1];
     } else {
-        $cover = $this->options->defaultCover ? $this->options->defaultCover : $this->options->themeUrl . '/img/default-cover.webp';
+        $cover = $options->defaultCover ?: $options->themeUrl . '/img/default-cover.webp';
     }
 } elseif ($this->is('index')) {
-    $cover = $this->options->homeCover ? $this->options->homeCover : $this->options->themeUrl . '/img/home-cover.webp';
+    $cover = $options->homeCover ?: $options->themeUrl . '/img/home-cover.webp';
 } else {
-    $cover = $this->options->defaultCover ? $this->options->defaultCover : $this->options->themeUrl . '/img/default-cover.webp';
+    $cover = $options->defaultCover ?: $options->themeUrl . '/img/default-cover.webp';
 }
-?>
-<!-- Canonical URL -->
-<?php if (!$this->is('post') && !$this->is('page')): ?>
-<link rel="canonical" href="<?php echo Typecho\Common::url($this->request->getRequestUri(), $this->options->siteUrl); ?>" />
-<?php endif; ?>
-<!-- Open Graph Tags -->
-<meta property="og:title" content="<?php $this->archiveTitle('', '', ''); ?><?php $this->options->title(); ?>" />
-<meta property="og:description" content="<?php echo $desc; ?>" />
 
-<meta property="og:image" content="<?php echo $cover; ?>" />
-<meta property="og:site_name" content="<?php $this->options->title(); ?>" />
-<?php if ($this->is('post') || $this->is('page')): ?>
+// 第一页使用 Typecho 归档地址，后续分页使用当前路径并移除查询参数。
+if ($this->is('index') && $currentPage === 1) {
+    $canonical = $options->siteUrl;
+} elseif ($currentPage > 1 || $is404) {
+    $canonical = strtok($this->request->getRequestUrl(), '?');
+} else {
+    $canonical = $this->getArchiveUrl();
+}
+
+$schemaTitle = ($this->is('post') || $this->is('page')) ? $this->title : $options->title;
+$logo = $options->logoUrl ?: $options->themeUrl . '/img/logo.webp';
+?>
+<title><?php echo htmlspecialchars($pageTitle, ENT_QUOTES, 'UTF-8'); ?></title>
+<meta name="author" content="<?php $this->author(); ?>" />
+<meta name="description" content="<?php echo htmlspecialchars($desc, ENT_QUOTES, 'UTF-8'); ?>" />
+<meta name="robots" content="<?php echo ($this->is('search') || $is404) ? 'noindex,follow' : 'index,follow'; ?>" />
+<?php if (!$this->is('post') && !$this->is('page') && !$is404): ?>
+<link rel="canonical" href="<?php echo htmlspecialchars($canonical, ENT_QUOTES, 'UTF-8'); ?>" />
+<?php endif; ?>
+<meta property="og:type" content="<?php echo $this->is('post') ? 'article' : 'website'; ?>" />
+<meta property="og:title" content="<?php echo htmlspecialchars($pageTitle, ENT_QUOTES, 'UTF-8'); ?>" />
+<meta property="og:description" content="<?php echo htmlspecialchars($desc, ENT_QUOTES, 'UTF-8'); ?>" />
+<meta property="og:url" content="<?php echo htmlspecialchars($canonical, ENT_QUOTES, 'UTF-8'); ?>" />
+<meta property="og:image" content="<?php echo htmlspecialchars($cover, ENT_QUOTES, 'UTF-8'); ?>" />
+<meta property="og:site_name" content="<?php echo htmlspecialchars($options->title, ENT_QUOTES, 'UTF-8'); ?>" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="<?php echo htmlspecialchars($pageTitle, ENT_QUOTES, 'UTF-8'); ?>" />
+<meta name="twitter:description" content="<?php echo htmlspecialchars($desc, ENT_QUOTES, 'UTF-8'); ?>" />
+<meta name="twitter:image" content="<?php echo htmlspecialchars($cover, ENT_QUOTES, 'UTF-8'); ?>" />
+<?php if ($this->is('post')): ?>
 <meta property="article:author" content="<?php $this->author(); ?>" />
 <meta property="article:published_time" content="<?php $this->date('c'); ?>" />
 <meta property="article:modified_time" content="<?php echo date('c', $this->modified); ?>" />
 <?php endif; ?>
 
-<?php if ($this->is('index') || $this->is('post') || $this->is('page')): ?>
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "<?php echo $this->is('post') ? 'BlogPosting' : ($this->is('page') ? 'WebPage' : 'WebSite'); ?>",
-  "name": "<?php $this->archiveTitle('', '', ''); ?>",
-  "headline": "<?php $this->archiveTitle('', '', ''); ?>",
-  "description": "<?php echo $desc; ?>",
-  "url": "<?php $this->permalink(); ?>",
-  "image": "<?php echo $cover; ?>",
-  "publisher": {
-    "@type": "Organization",
-    "name": "<?php $this->options->title(); ?>",
-    "logo": {
-      "@type": "ImageObject",
-	  "url": "<?php echo $this->options->logoUrl ? $this->options->logoUrl : $this->options->themeUrl . '/img/logo.webp'; ?>"
-    }
-  }
-  <?php if ($this->is('post') || $this->is('page')): ?>
-  ,"datePublished": "<?php $this->date('c'); ?>",
-  "dateModified": "<?php echo date('c', $this->modified); ?>",
-  "author": {
-    "@type": "Person",
-    "name": "<?php $this->author(); ?>",
-    "url": "<?php $this->author->permalink(); ?>"
-  }
-  <?php endif; ?>
+<?php if ($this->is('index') || $this->is('post') || $this->is('page')):
+$schema = array(
+    '@context' => 'https://schema.org',
+    '@type' => $this->is('post') ? 'BlogPosting' : ($this->is('page') ? 'WebPage' : 'WebSite'),
+    'name' => $schemaTitle,
+    'headline' => $schemaTitle,
+    'description' => $desc,
+    'url' => $canonical,
+    'image' => $cover,
+    'publisher' => array(
+        '@type' => 'Organization',
+        'name' => $options->title,
+        'logo' => array('@type' => 'ImageObject', 'url' => $logo)
+    )
+);
+if ($this->is('post') || $this->is('page')) {
+    ob_start();
+    $this->date('c');
+    $schema['datePublished'] = ob_get_clean();
+    $schema['dateModified'] = date('c', $this->modified);
+    $schema['author'] = array(
+        '@type' => 'Person',
+        'name' => $this->author->screenName,
+        'url' => $this->author->permalink
+    );
 }
-</script>
+?>
+<script type="application/ld+json"><?php echo json_encode($schema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?></script>
 <?php endif; ?>
 
-<?php $this->header('generator=&template=&pingback=&xmlrpc=&wlw=&commentReply=&rss1=&rss2=&antiSpam=&atom='); ?>
+<?php // description 和 social 由主题输出，避免与 Typecho 1.3 核心重复。
+$this->header('description=&social=&generator=&template=&pingback=&xmlrpc=&wlw=&commentReply=&rss1=&rss2=&antiSpam=&atom='); ?>
 <link rel="stylesheet" href="<?php cjUrl('style.min.css') ?>" />
+<?php if ($this->options->Highlight): ?>
+<link rel="stylesheet" href="<?php cjUrl('code-block-tools.css') ?>" />
+<script>
+window.codeBlockStyle = <?php echo (int)($this->options->CodeBlockStyle ?? 1); ?>;
+</script>
+<?php endif; ?>
+<?php if (!empty($this->options->Navset) && in_array('ShowCategory', $this->options->Navset)): ?>
+<link rel="stylesheet" href="<?php cjUrl('navigation-category-tree.css') ?>" />
+<?php endif; ?>
+<link rel="stylesheet" href="<?php cjUrl('theme-switch.css') ?>" />
+<?php if ($this->options->RelatedPosts): ?>
+<link rel="stylesheet" href="<?php cjUrl('related-posts.css') ?>" />
+<?php endif; ?>
 <?php if ($this->options->CustomCSS): ?>
 <style type="text/css"><?php $this->options->CustomCSS(); ?></style>
 <?php endif; ?>
@@ -113,6 +206,54 @@ if ($this->is('post') || $this->is('page')) {
 </div>
 <script>function Navswith(){document.getElementById("header").classList.toggle("on")}</script>
 <button id="nav-swith" onclick="Navswith()" aria-label="切换导航菜单"><span></span></button>
+<div class="theme-switcher">
+<button
+    id="theme-switcher-toggle"
+    class="theme-switcher__toggle"
+    type="button"
+    aria-label="配色模式：<?php echo $themeModeLabels[$defaultThemeMode]; ?>"
+    aria-haspopup="true"
+    aria-expanded="false"
+    aria-controls="theme-switcher-menu"
+    title="配色模式：<?php echo $themeModeLabels[$defaultThemeMode]; ?>"
+>
+<svg class="theme-switcher__icon theme-switcher__icon--light" aria-hidden="true" focusable="false" viewBox="0 0 24 24">
+<circle cx="12" cy="12" r="4"></circle>
+<path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.42"></path>
+</svg>
+<svg class="theme-switcher__icon theme-switcher__icon--dark" aria-hidden="true" focusable="false" viewBox="0 0 24 24">
+<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
+</svg>
+<svg class="theme-switcher__icon theme-switcher__icon--auto" aria-hidden="true" focusable="false" viewBox="0 0 24 24">
+<rect width="20" height="14" x="2" y="3" rx="2"></rect>
+<line x1="8" x2="16" y1="21" y2="21"></line>
+<line x1="12" x2="12" y1="17" y2="21"></line>
+</svg>
+</button>
+<div id="theme-switcher-menu" class="theme-switcher__menu" role="menu" aria-label="配色模式" hidden>
+<button class="theme-switcher__option" type="button" role="menuitemradio" aria-checked="<?php echo $defaultThemeMode === 'light' ? 'true' : 'false'; ?>" data-theme-value="light">
+<svg aria-hidden="true" focusable="false" viewBox="0 0 24 24">
+<circle cx="12" cy="12" r="4"></circle>
+<path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.42"></path>
+</svg>
+<span>浅色</span>
+</button>
+<button class="theme-switcher__option" type="button" role="menuitemradio" aria-checked="<?php echo $defaultThemeMode === 'dark' ? 'true' : 'false'; ?>" data-theme-value="dark">
+<svg aria-hidden="true" focusable="false" viewBox="0 0 24 24">
+<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
+</svg>
+<span>深色</span>
+</button>
+<button class="theme-switcher__option" type="button" role="menuitemradio" aria-checked="<?php echo $defaultThemeMode === 'auto' ? 'true' : 'false'; ?>" data-theme-value="auto">
+<svg aria-hidden="true" focusable="false" viewBox="0 0 24 24">
+<rect width="20" height="14" x="2" y="3" rx="2"></rect>
+<line x1="8" x2="16" y1="21" y2="21"></line>
+<line x1="12" x2="12" y1="17" y2="21"></line>
+</svg>
+<span>跟随系统</span>
+</button>
+</div>
+</div>
 <nav id="nav">
 <div id="site-search">
 <form id="search" method="post" action="<?php $this->options->siteUrl(); ?>">
@@ -122,38 +263,8 @@ if ($this->is('post') || $this->is('page')) {
 </div>
 <ul class="nav-menu">
 <li><a href="<?php $this->options->siteUrl(); ?>">首页</a></li>
-<?php if (!empty($this->options->Navset) && in_array('ShowCategory', $this->options->Navset)): if (in_array('AggCategory', $this->options->Navset)): ?>
-<li class="menu-parent"><a><?php echo $this->options->CategoryText ? $this->options->CategoryText : '分类' ?></a>
-<ul>
-<?php
-endif;
-$this->widget('Widget_Metas_Category_List')->to($categorys);
-while($categorys->next()):
-if ($categorys->levels == 0):
-$children = $categorys->getAllChildren($categorys->mid);
-if (empty($children)):
-?>
-<li><a href="<?php $categorys->permalink(); ?>" title="<?php $categorys->name(); ?>"><?php $categorys->name(); ?></a></li>
-<?php else: ?>
-<li class="menu-parent">
-<a href="<?php $categorys->permalink(); ?>" title="<?php $categorys->name(); ?>"><?php $categorys->name(); ?></a>
-<ul class="menu-child">
-<?php foreach ($children as $mid) {
-$child = $categorys->getCategory($mid); ?>
-<li><a href="<?php echo $child['permalink'] ?>" title="<?php echo $child['name']; ?>"><?php echo $child['name']; ?></a></li>
-<?php } ?>
-</ul>
-</li>
-<?php
-endif;
-endif;
-endwhile;
-?>
-<?php if (in_array('AggCategory', $this->options->Navset)): ?>
-</ul>
-</li>
-<?php
-endif;
+<?php if (!empty($this->options->Navset) && in_array('ShowCategory', $this->options->Navset)):
+NavigationCategories($this, in_array('AggCategory', $this->options->Navset));
 endif;
 if (!empty($this->options->Navset) && in_array('ShowPage', $this->options->Navset)):
 if (in_array('AggPage', $this->options->Navset)):

@@ -4,7 +4,7 @@
   <img src="screenshot.png" width="50%" height="auto" alt="主题封面">
 </div>
 
-![Version](https://img.shields.io/badge/version-3.2.8-blue)
+![Version](https://img.shields.io/badge/version-3.5.0-blue)
 ![Typecho](https://img.shields.io/badge/Typecho-1.3-green)
 ![PHP](https://img.shields.io/badge/PHP-8.1+-red)
 ![License](https://img.shields.io/badge/license-MIT-brightgreen)
@@ -82,9 +82,13 @@
 
 ## 📈 当前版本更新日志
 
-**当前版本：v3.2.8 (2026-04-08)**
+**当前版本：v3.5.0 (2026-08-30)**
 
-- **functions.php**: 优化主题设置备份功能，添加操作确认对话框防止误操作、使用不同颜色区分按钮类型、实现版本管理（自动保留最近2个备份）、添加备份列表显示方便查看
+- 修复：回复可见内容访问控制（[PR #13](https://github.com/YuYisir/Initial-M/pull/13)）
+- 新增：导航栏多级分类菜单，样式沿用原版风格（[PR #5](https://github.com/YuYisir/Initial-M/pull/5)）
+- 新增：全局明暗主题切换，亮/暗/自动三档（[PR #7](https://github.com/YuYisir/Initial-M/pull/7)）
+- 新增：推荐文章展示，优先同标签/分类补齐最新文章（[PR #9](https://github.com/YuYisir/Initial-M/pull/9)）
+- 调整：分类菜单与主题切换样式适配，PR 新增静态资源压缩
 
 
 📄 查看完整详细历史更新请前往 [CHANGELOG.md](CHANGELOG.md)

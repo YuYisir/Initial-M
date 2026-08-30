@@ -5,7 +5,7 @@
  * 
  * @package Initial-M
  * @author YuYisir
- * @version 3.2.8
+ * @version 3.5.0
  * @link https://www.886a.top/
  */
 if (!defined('__TYPECHO_ROOT_DIR__')) exit;
@@ -17,7 +17,7 @@ if ($this->_currentPage == 1 && !empty($this->options->ShowWhisper) && in_array(
 <?php endif; ?>
 <?php while($this->next()): ?>
 <article class="post<?php if ($this->options->PjaxOption && $this->hidden): ?> protected<?php endif; ?>">
-<h2 class="post-title"><a href="<?php $this->permalink() ?>"><?php $this->title() ?></a></h2>
+<h2 class="post-title"><a href="<?php $this->permalink() ?>"><?php $this->title() ?></a><?php echo recentlyUpdatedBadge($this); ?></h2>
 <ul class="post-meta">
 <li><?php $this->date(); ?></li>
 <li><?php $this->category(',', false); ?></li>
@@ -30,6 +30,7 @@ if ($this->_currentPage == 1 && !empty($this->options->ShowWhisper) && in_array(
 <p class="word">请输入密码访问</p>
 <p>
 <input type="password" class="text" name="protectPassword" />
+<input type="hidden" name="protectCID" value="<?php $this->cid(); ?>" />
 <input type="submit" class="submit" value="提交" />
 </p>
 </form>
