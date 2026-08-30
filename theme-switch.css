@@ -171,7 +171,7 @@ html[data-theme="auto"] .theme-switcher__icon--auto {
 .theme-dark #main > .post,
 .theme-dark #secondary .widget {
 	color: var(--theme-text);
-	background-color: var(--theme-surface) !important;
+	/* background-color: var(--theme-surface) !important; */
 	border-color: var(--theme-border);
 }
 

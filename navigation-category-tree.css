@@ -2,11 +2,22 @@
 	position: relative;
 }
 
+/* 还原原版 .menu-parent ul 面板风格：半透明浅灰、圆角、居中、无阴影 */
 .nav-category-tree {
+	position: absolute;
+	left: 50%;
+	min-width: 100px;
 	margin: 0;
 	padding: 0;
-	min-width: 150px;
+	border-radius: 5px;
+	background: rgba(238, 238, 238, .95);
+	text-align: center;
 	list-style: none;
+	transform: translateX(-50%);
+	-webkit-transform: translateX(-50%);
+	z-index: 999;
+	transition: .2s;
+	-webkit-transition: .2s;
 }
 
 .nav-category-tree li {
@@ -21,11 +32,10 @@
 
 .nav-category-tree a {
 	display: block;
-	box-sizing: border-box;
-	padding: 6px 12px;
 	overflow: hidden;
 	white-space: nowrap;
 	text-overflow: ellipsis;
+	cursor: pointer;
 }
 
 .nav-category-tree .category-active > a,
@@ -33,39 +43,24 @@
 	font-weight: 700;
 }
 
+/* 还原原版面板顶部朝上箭头 */
+.nav-category-tree::before {
+	content: "";
+	position: absolute;
+	top: -7px;
+	left: 50%;
+	margin-left: -7px;
+	border-left: 7px solid transparent;
+	border-right: 7px solid transparent;
+	border-bottom: 7px solid rgba(238, 238, 238, .95);
+}
+
 @media (min-width: 601px) {
 	.nav-category-root > .nav-category-tree,
-	.nav-menu > .nav-category-item > .nav-category-tree {
-		position: absolute;
-		top: 100%;
-		left: 50%;
-		z-index: 1000;
-		width: max-content;
-		max-width: 260px;
-		visibility: hidden;
-		opacity: 0;
-		background: rgba(238, 238, 238, .97);
-		border-radius: 5px;
-		box-shadow: 0 8px 20px rgba(15, 23, 42, .12);
-		transform: translateX(-50%);
-		transition: opacity .2s ease;
-	}
-
+	.nav-menu > .nav-category-item > .nav-category-tree,
 	.nav-category-tree .nav-category-tree {
-		position: absolute;
-		top: 0;
-		right: calc(100% - 1px);
-		left: auto;
-		z-index: 1001;
-		width: max-content;
-		max-width: 260px;
 		visibility: hidden;
 		opacity: 0;
-		background: rgba(221, 221, 221, .98);
-		border-radius: 5px;
-		box-shadow: 0 8px 20px rgba(15, 23, 42, .12);
-		transform: none;
-		transition: opacity .2s ease;
 	}
 
 	.nav-category-root:hover > .nav-category-tree,
@@ -76,13 +71,27 @@
 		opacity: 1;
 	}
 
-	.nav-category-root .nav-category-tree .nav-category-tree::before {
-		display: none;
+	/* 还原原版 .menu-child 二级面板：左侧滑出、hover 左移 */
+	.nav-category-tree .nav-category-tree {
+		top: 5px;
+		left: -30px;
+		background: rgba(221, 221, 221, .95);
+		transform: translateX(-100%);
+		-webkit-transform: translateX(-100%);
 	}
 
-	.nav-category-tree a:hover,
-	.nav-category-tree a:focus-visible {
-		background: rgba(255, 255, 255, .55);
+	.nav-category-tree .nav-category-item:hover > .nav-category-tree {
+		left: -7px;
+	}
+
+	/* 二级面板箭头朝右 */
+	.nav-category-tree .nav-category-tree::before {
+		top: 7px;
+		left: 100%;
+		margin: 0;
+		border-top: 7px solid transparent;
+		border-bottom: 7px solid transparent;
+		border-left: 7px solid rgba(221, 221, 221, .95);
 	}
 }
 
@@ -91,32 +100,21 @@
 	.nav-menu > .nav-category-item > .nav-category-tree,
 	.nav-category-tree .nav-category-tree {
 		position: relative;
-		top: auto;
-		right: auto;
-		left: auto;
-		width: 82%;
+		left: 0;
+		width: 75%;
 		min-width: 0;
-		max-width: none;
 		margin: 0 auto;
 		visibility: visible;
 		opacity: 1;
-		background: rgba(238, 238, 238, .95);
-		border-radius: 5px;
-		box-shadow: none;
 		transform: none;
+		-webkit-transform: none;
 	}
 
-	.nav-category-tree .nav-category-tree {
-		width: 90%;
-		background: rgba(221, 221, 221, .7);
-	}
-
-	.nav-category-tree::before {
-		display: none;
-	}
-
-	.nav-category-tree a {
-		padding: 5px 10px;
+	/* 移动端二级面板箭头朝下（原版行为） */
+	.nav-category-tree .nav-category-tree::before {
+		border-left: 7px solid transparent;
+		border-right: 7px solid transparent;
+		border-bottom: 7px solid rgba(221, 221, 221, .95);
 	}
 }
 
